@@ -9,6 +9,7 @@ import static io.leitstand.commons.model.ObjectUtil.optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -40,6 +41,34 @@ public class ObjectUtilTest {
 		Function<Object,?> function = mock(Function.class);
 		assertNull(optional(null,predicate,function));
 		verifyZeroInteractions(predicate,function);
+	}
+	
+	@Test
+	public void optional_maps_null_object_to_default_value() {
+		Function<Object,Object> getter = mock(Function.class);
+		Object defaultValue = new Object();
+		assertSame(defaultValue,optional(null,getter,defaultValue));
+		verifyZeroInteractions(getter);
+	}
+
+	@Test
+	public void optional_maps_null_property_to_default_value() {
+		Function<Object,Object> getter = mock(Function.class);
+		Object object = new Object();
+		Object defaultValue = new Object();
+		assertSame(defaultValue,optional(object,getter,defaultValue));
+		verify(getter).apply(object);
+	}
+	
+	@Test
+	public void optional_returns_property_value() {
+		Object object = new Object();
+		Object value = new Object();
+		Object defaultValue = new Object();
+		Function<Object,Object> getter = mock(Function.class);
+		when(getter.apply(object)).thenReturn(value);
+		assertSame(value,optional(object,getter,defaultValue));
+		verify(getter).apply(object);
 	}
 	
 	@Test
