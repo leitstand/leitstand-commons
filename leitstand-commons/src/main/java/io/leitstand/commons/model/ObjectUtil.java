@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 public final class ObjectUtil {
 	
 	/**
-	 * Reads a property from an object.
+	 * Reads an optional property from an object.
 	 * Returns <code>null</code> if the specified object is <code>null</code>.
 	 * @param object the object
 	 * @param getter the getter method to read the property
@@ -33,6 +33,25 @@ public final class ObjectUtil {
 			return null;
 		}
 		return getter.apply(object);
+	}
+	
+	/**
+	 * Reads a property from an object.
+	 * Returns <code>null</code> if the specified object is <code>null</code>.
+	 * @param object the object
+	 * @param getter the getter method to read the property
+	 * @paran defaultValue the default value if the object is <code>null</code> or the getter returns <code>null</code>
+	 * @return the property value or <code>null</code> if the specified object is <code>null</code>.
+	 */
+	public static <O,P> P optional(O object, Function<? super O,P> getter, P defaultValue ) {
+		if(object == null) {
+			return defaultValue;
+		}
+		P value = getter.apply(object);
+		if(value == null) {
+			return defaultValue;
+		}
+		return value;
 	}
 	
 	/**

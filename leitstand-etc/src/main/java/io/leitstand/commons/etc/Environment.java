@@ -6,8 +6,12 @@ package io.leitstand.commons.etc;
 import static io.leitstand.commons.etc.FileProcessor.yaml;
 import static io.leitstand.commons.model.StringUtil.isNonEmptyString;
 import static java.lang.String.format;
+import static java.lang.System.getenv;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
 import static java.util.logging.Level.FINE;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
 import java.io.FileReader;
@@ -16,9 +20,13 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -38,21 +46,6 @@ public class Environment {
 	public static Environment emptyEnvironment() {
 		return new Environment();
 	}
-	
-	public static <T> String getProperty(T config, Function<T,String> getter) {
-		return getProperty(config,getter,null);
-	}
-	
-	public static <T> String getProperty(T config, Function<T,String> getter, String defaultValue){
-		if(config == null) {
-			return defaultValue;
-		}
-		String value = getter.apply(config);
-		if(value == null) {
-			return defaultValue;
-		}
-		return null;
-	}
 
 	public static String getSystemProperty(String name) {
 		return getSystemProperty(name,null);
@@ -69,6 +62,55 @@ public class Environment {
 		}
 		return defaultValue;
 	}
+	
+	public static Map<String,String> getSystemProperties(String pattern){
+		return getSystemProperties(compile(pattern));
+	}
+	
+	public static Map<String,String> getSystemProperties(Pattern pattern){
+		return getSystemProperties(pattern, emptyMap());
+	}
+
+	public static Map<String,String> getSystemProperties(String pattern, Properties defaultProperties){
+		return getSystemProperties(compile(pattern),defaultProperties);
+	}
+	
+	public static Map<String,String> getSystemProperties(Pattern pattern, Properties defaultProperties ){
+		Map<String,String> defaultPropertiesMap = new HashMap<>();
+		for(String property : defaultProperties.stringPropertyNames()) {
+			defaultProperties.put(property, defaultProperties.getProperty(property));
+		}
+		return getSystemProperties(pattern,defaultPropertiesMap);
+	}
+
+	
+	public static Map<String,String> getSystemProperties(String pattern, Map<String,String> defaultProperties){
+		return getSystemProperties(compile(pattern),defaultProperties);
+	}
+	
+	public static Map<String,String> getSystemProperties(Pattern pattern, Map<String,String> defaultProperties){
+		Map<String,String> properties = new TreeMap<>();
+		
+		properties.putAll(defaultProperties.entrySet()
+										   .stream()
+										   .filter(entry -> pattern.matcher(entry.getKey()).matches())
+										   .collect(toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		
+		
+		properties.putAll(getenv().entrySet()
+				   				  .stream()
+				   				  .filter(entry -> pattern.matcher(entry.getKey()).matches())
+				   				  .collect(toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		
+		for(String name : System.getProperties().stringPropertyNames()) {
+			if(pattern.matcher(name).matches()) {
+				properties.put(name, System.getProperty(name));
+			}
+		}
+		return properties;
+	}
+
+	
 	
 	private File baseDir;
 	private LeitstandSettings settings;
