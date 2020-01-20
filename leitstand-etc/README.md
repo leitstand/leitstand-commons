@@ -7,17 +7,17 @@ _Leitstand Environment_ provides access to environment variables and the Leitsta
 Leitstand environment supports JVM system properties and process environment properties,
 with precedence for JVM system properties.
 
-For example, the listing below reads the `leitstand.etc.root` system property first.
-If no `leitstand.etc.root` system property exists, environment searches for a `leitstand.etc.root` process environment variable. 
+For example, the listing below reads the `LEITSTAND_ETC_ROOT` system property first.
+If no `LEITSTAND_ETC_ROOT` system property exists, environment searches for a `LEITSTAND_ETC_ROOT` process environment variable. 
 The value defaults to `/etc/leitstand` if the environment variable does not exist either
  
 ```Java
-String dir = Environment.getSystemProperty("leitstand.etc.root","/etc/leitstand");
+String dir = Environment.getSystemProperty("LEITSTAND_ETC_ROOT","/etc/leitstand");
 ```
 
 ## Leitstand Configuration Directory
 Leitstand defines a base configuration directory. 
-The directory location is specified by the `leitstand.etc.root` property and defaults to `/etc/leitstand`. 
+The directory location is specified by the `LEITSTAND_ETC_ROOT` property and defaults to `/etc/leitstand`. 
 
 Leitstand modules can use the `Environment` to read configuration files from the configuration directory.
 Say a _Leitstand Telemetry_ application wants to read the `GrafanaConfig` from the `grafana.yaml` file in the configuration directory ([Grafana](https://grafana.com) is a popular tool for metric visualization), then the environment can be used as follows to read the configuration:

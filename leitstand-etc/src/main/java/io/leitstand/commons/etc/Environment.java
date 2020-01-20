@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Rtbrick Inc.
+ * Copyright 2020 RtBrick Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -12,7 +12,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
-*/
+ */
 package io.leitstand.commons.etc;
 
 import static io.leitstand.commons.etc.FileProcessor.yaml;
@@ -44,9 +44,9 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
 /**
- * The <code>Environment</code> provides access to the environment properties stored in the <code>/etc/rbms/environment.yaml</code> file
+ * The <code>Environment</code> provides access to the environment properties stored in the <code>/etc/leitstand/leitstand.yaml</code> file
  * as well as access to all other EMS configuration files. 
- * All configuration files shall be located in the <code>/etc/rbms</code> directory or sub directories.
+ * All configuration files shall be located in the <code>/etc/leitstand</code> directory or sub directories.
  * <p>
  * The <code>Environment</code> is an <code>{@literal @ApplicationScoped}</code> bean and can be obtained via CDI.
  */
@@ -90,7 +90,7 @@ public class Environment {
 	public static Map<String,String> getSystemProperties(Pattern pattern, Properties defaultProperties ){
 		Map<String,String> defaultPropertiesMap = new HashMap<>();
 		for(String property : defaultProperties.stringPropertyNames()) {
-			defaultProperties.put(property, defaultProperties.getProperty(property));
+			defaultPropertiesMap.put(property, defaultProperties.getProperty(property));
 		}
 		return getSystemProperties(pattern,defaultPropertiesMap);
 	}
@@ -129,8 +129,8 @@ public class Environment {
 	
 	@PostConstruct
 	protected void readEnvironmentProperties() {
-		baseDir = new File(getSystemProperty("leitstand.etc.root","/etc/leitstand"));
-		settings = loadConfig("leitstand.settings", 
+		baseDir = new File(getSystemProperty("LEITSTAND_ETC_ROOT","/etc/leitstand"));
+		settings = loadConfig("leitstand.yaml", 
 							  yaml(LeitstandSettings.class),
 							  LeitstandSettings::new);
 	}
