@@ -223,7 +223,7 @@ public class Environment {
 		
 		
 		if(!config.exists() || !config.canRead()) {
-			String msg = format("Cannot read from file %s. Proceed with default file (%s) shipped with RBMS binaries.",
+			String msg = format("Cannot read from file %s. Proceed with default file (%s) shipped with Leitstand binaries.",
 					   			config,
 					   			defaultUrl);
 			LOG.warning(msg);
@@ -233,7 +233,7 @@ public class Environment {
 		try {
 			return config.toURI().toURL();
 		} catch (MalformedURLException e) {
-			String msg = format("File %s cannot be accessed due to malformed URL: %s. Proceed with default file (%s) shipped with RBMS binaries.",
+			String msg = format("File %s cannot be accessed due to malformed URL: %s. Proceed with default file (%s) shipped with Leitstand binaries.",
 					   			file,
 					   			e.getMessage(),
 					   			defaultUrl);
