@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class EnvironmentTest {
 	}
 	
 	@Test
-	public void filter_properties_by_regular_expression() {
+	public void filter_properties_by_regular_expression_merge_default_values() {
 		System.setProperty("foo.bar.a","a");
 		System.setProperty("foo.bar.b","b");
 		System.setProperty("foo.xyz.c","c");
@@ -47,6 +48,35 @@ public class EnvironmentTest {
 		assertTrue(props.containsKey("foo.bar.a"));
 		assertTrue(props.containsKey("foo.bar.b"));
 		assertTrue(props.containsKey("foo.bar.c"));
+	}
+	
+	
+	@Test
+	public void filter_properties_by_regular_expression_merge_default_properties() {
+		System.setProperty("foo.bar.a","a");
+		System.setProperty("foo.bar.b","b");
+		System.setProperty("foo.xyz.c","c");
+		
+		Properties defaultProperties = new Properties();
+		defaultProperties.put("foo.bar.c","c");
+		
+		Map<String,String> props = getSystemProperties("foo\\.bar\\..*",defaultProperties);
+		assertEquals(3, props.size());
+		assertTrue(props.containsKey("foo.bar.a"));
+		assertTrue(props.containsKey("foo.bar.b"));
+		assertTrue(props.containsKey("foo.bar.c"));
+	}
+	
+	@Test
+	public void filter_properties_by_regular_expression_without_defaults() {
+		System.setProperty("foo.bar.a","a");
+		System.setProperty("foo.bar.b","b");
+		System.setProperty("foo.xyz.c","c");
+		
+		Map<String,String> props = getSystemProperties("foo\\.bar\\..*");
+		assertEquals(2, props.size());
+		assertTrue(props.containsKey("foo.bar.a"));
+		assertTrue(props.containsKey("foo.bar.b"));
 	}
 	
 }
