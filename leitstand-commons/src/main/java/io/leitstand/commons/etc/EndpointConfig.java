@@ -28,6 +28,8 @@ public class EndpointConfig {
 		return new EndpointConfig(url);
 	}
 
+
+	
 	protected EndpointConfig() {
 		// Tool Ctor
 		this.timeout = Duration.ofMillis(10000).toString();

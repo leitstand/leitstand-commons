@@ -15,8 +15,6 @@ The following Java APIs are used in Leitstand:
 - Java Database Connectivity (JDBC)
 
 
-The _leitstand-commons_ project contains the Leitstand foundation classes and outlines [how to implement a Leitstand Java module](./leitstand-commons/README.md).
-In addition, the _leitstand-etc_ project provides means to [load the module configuration](./leitstand-etc/README.md).
+The _leitstand-commons_ project contains the Leitstand foundation classes to [implement a Leitstand Java module](./leitstand-commons/README.md)
 
 The _leitstand-test_ project contains base classes for [unit and integration testing](./leitstand-test/README.md) supplying an in-memory database and transaction management.
-

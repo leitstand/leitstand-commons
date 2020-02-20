@@ -20,23 +20,31 @@ import static io.leitstand.commons.model.StringUtil.isNonEmptyString;
 import static java.lang.String.format;
 import static java.lang.System.getenv;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -125,23 +133,73 @@ public class Environment {
 	
 	
 	private File baseDir;
-	private LeitstandSettings settings;
 	
 	@PostConstruct
 	protected void readEnvironmentProperties() {
 		baseDir = new File(getSystemProperty("LEITSTAND_ETC_ROOT","/etc/leitstand"));
-		settings = loadConfig("leitstand.yaml", 
-							  yaml(LeitstandSettings.class),
-							  LeitstandSettings::new);
-	}
-	
-	public LeitstandSettings getSettings() {
-		return settings;
 	}
 	
 	public <T> T loadConfig(String fileName,
 						  FileProcessor<T> processor) {
 		return loadConfig(fileName,processor);
+	}
+	
+	
+	public <T> List<T> loadConfigs(String path, FilenameFilter filter, FileProcessor<T> processor){
+		File dir = new File(baseDir,path);
+		if(!dir.exists()) {
+			LOG.warning(() -> format("Directory %s does not exist and will not be processed.",
+									 dir.getAbsolutePath()));
+			return emptyList();
+		}
+		
+		List<T> configs = new LinkedList<>();
+		int success = 0;
+		int failure = 0;
+		for(File file : dir.listFiles(filter)) {
+			try (FileReader reader = new FileReader(file)){
+				configs.add(processor.process(reader)); 
+				success++;
+			} catch (Exception e) {
+				failure++;
+				LOG.warning(() -> format("Cannot process file %s. Reason: %s",
+									file.getAbsolutePath(),
+									e.getMessage()));
+				LOG.log(Level.FINE,e.getMessage(),e);
+			}
+		}
+		LOG.info(format("Succeeded reading %d configurations from %s.",success,dir.getAbsolutePath()));
+		LOG.info(format("Failed reading %d configurations from %s.",failure,dir.getAbsolutePath()));
+		return unmodifiableList(configs);
+	}
+	
+	public <T> List<T> loadConfigs(String path, FileFilter filter, FileProcessor<T> processor){
+		File dir = new File(baseDir,path);
+		if(!dir.exists()) {
+			String msg = format("Directory %s does not exist and will not be processed.",
+								dir.getAbsolutePath());
+			LOG.warning(msg);
+			return emptyList();
+		}
+		
+		List<T> configs = new LinkedList<>();
+		int success = 0;
+		int failure = 0;
+		for(File file : dir.listFiles(filter)) {
+			try (FileReader reader = new FileReader(file)){
+				configs.add(processor.process(reader)); 
+				success++;
+			} catch (Exception e) {
+				failure++;
+				LOG.warning(() -> format("Cannot process file %s. Reason: %s",
+									file.getAbsolutePath(),
+									e.getMessage()));
+				LOG.log(Level.FINE,e.getMessage(),e);
+			}
+		}
+		LOG.info(format("Added %d contributions from %s.",success,dir.getAbsolutePath()));
+		LOG.warning(format("Failed to add %d contributions from %s.",failure,dir.getAbsolutePath()));
+		return unmodifiableList(configs);		
 	}
 	
 	public <T> T loadConfig(String fileName,
@@ -151,9 +209,8 @@ public class Environment {
 		File config = new File(baseDir,fileName);
 		if(!config.exists()) {
 			if(defaultFactory != null) {
-				String msg = format("File %s does not exist. Proceed with default configuration.",
-	    			   			   	config.getAbsolutePath());
-				LOG.warning(msg);
+				LOG.warning(() -> format("File %s does not exist. Proceed with default configuration.",
+		   			   					 config.getAbsolutePath()));
 				return defaultFactory.get();
 			}
 			
@@ -171,7 +228,7 @@ public class Environment {
 							   e));
 			LOG.log(FINE, e.getMessage(), e);
 			if(defaultFactory != null) {
-				LOG.info(String.format("Use %s default config",fileName));
+				LOG.info(() -> format("Use %s default config",fileName));
 				return defaultFactory.get();
 			}	
 			return null;
@@ -223,29 +280,22 @@ public class Environment {
 		
 		
 		if(!config.exists() || !config.canRead()) {
-			String msg = format("Cannot read from file %s. Proceed with default file (%s) shipped with Leitstand binaries.",
-					   			config,
-					   			defaultUrl);
-			LOG.warning(msg);
+			LOG.warning(format("Cannot read from file %s. Proceed with default file (%s) shipped with Leitstand binaries.",
+		   			    	   config,
+		   					   defaultUrl));
 			return defaultUrl;
 		}
 		
 		try {
 			return config.toURI().toURL();
 		} catch (MalformedURLException e) {
-			String msg = format("File %s cannot be accessed due to malformed URL: %s. Proceed with default file (%s) shipped with Leitstand binaries.",
-					   			file,
-					   			e.getMessage(),
-					   			defaultUrl);
-			LOG.warning(msg);
+			LOG.warning(format("File %s cannot be accessed due to malformed URL: %s. Proceed with default file (%s) shipped with Leitstand binaries.",
+		   					   file,
+		   					   e.getMessage(),
+		   					   defaultUrl));
 			LOG.log(FINE, e.getMessage(), e);
 			return defaultUrl;
 		}
 	}
-
-	public URI getLeitstandApiEndpoint() {
-		return settings.getLeitstandApi().getEndpoint();
-	}
-
 	
 }
