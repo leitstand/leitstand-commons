@@ -568,17 +568,41 @@ Processors can query events from the message queue.
 ## Resource
 
 Resources rely on the JAX-RS and JSON-B APIs and implement the REST API of a Leitstand module.
+
+__Convention:__ _All resources are annotated with the _ `@Resource` _annotation_.
+
+The `@Resource` annotation (`io.leitstand.commons.rs`) makes the resource a [`@RequestScoped`](https://javaee.github.io/javaee-spec/javadocs/javax/enterprise/context/RequestScoped.html) CDI-managed bean.
 Each resource validates all input parameters with bean validation ( `@Valid` ) and 
-checks whether the caller has sufficient privileges to execute the requested operation (`@RolesAllowed`).
+checks whether the caller has sufficient privileges to execute the requested operation.
 
-__Convention:__ _A resource is a [`@RequestScoped`](https://javaee.github.io/javaee-spec/javadocs/javax/enterprise/context/RequestScoped.html) CDI-managed bean_.
+### Authorization
 
-
-The listing below shows the resource that implements the REST API endpoint to manage the general settings of an element.
+Leitstand uses a scope-based authorization scheme.
+A scope defines a set of operations a user is allowed to execute.
+Each Leitstand component has to provide a list of existing scopes.
+A scope can be assigned to multiple resources using the `@Scopes` annotation.
+Scopes can be declared on the resource class and on each method.
+Scope declarations are cumulative. 
+Say `@Scopes("x","y")` are declared on the class and `@Scopes("z")` is declared on the method then the scopes `x`,`y` and `z` are allowed to perform the operation.
+A resource without `@Scopes` annotation can be accessed by all authenticated users.
+A resource annotated as `@Public` resource can be accessed by everyone including unauthenticated users.
+The resources to login to Leitstand are examples for public resources.
 
 ```Java
 /*
- * (c) RtBrick, Inc - All rights reserved, 2015 - 2019
+ * Copyright 2020 RtBrick Inc.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package io.leitstand.inventory.rs;
 
@@ -588,13 +612,13 @@ import static io.leitstand.commons.model.Patterns.UUID_PATTERN;
 import static io.leitstand.commons.rs.ReasonCode.VAL0003E_IMMUTABLE_ATTRIBUTE;
 import static io.leitstand.commons.rs.Responses.created;
 import static io.leitstand.commons.rs.Responses.success;
+import static io.leitstand.inventory.rs.Scopes.IVT;
+import static io.leitstand.inventory.rs.Scopes.IVT_ELEMENT;
+import static io.leitstand.inventory.rs.Scopes.IVT_ELEMENT_SETTINGS;
+import static io.leitstand.inventory.rs.Scopes.IVT_READ;
 import static io.leitstand.inventory.service.ReasonCode.IVT0307E_ELEMENT_NAME_ALREADY_IN_USE;
-import static io.leitstand.security.auth.Role.OPERATOR;
-import static io.leitstand.security.auth.Role.SYSTEM;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import javax.annotation.security.RolesAllowed;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.validation.Valid;
@@ -611,15 +635,18 @@ import io.leitstand.commons.EntityNotFoundException;
 import io.leitstand.commons.UniqueKeyConstraintViolationException;
 import io.leitstand.commons.UnprocessableEntityException;
 import io.leitstand.commons.messages.Messages;
+import io.leitstand.commons.rs.Resource;
 import io.leitstand.inventory.service.ElementId;
 import io.leitstand.inventory.service.ElementName;
 import io.leitstand.inventory.service.ElementSettings;
 import io.leitstand.inventory.service.ElementSettingsService;
+import io.leitstand.security.auth.Scopes;
 
 /**
  * Manages the general settings of an element.
  */
-@RequestScoped
+@Resource
+@Scopes({IVT, IVT_ELEMENT,IVT_ELEMENT_SETTINGS})
 @Path("/elements")
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
@@ -627,20 +654,21 @@ public class ElementSettingsResource{
 
   @Inject
   private ElementSettingsService service;
-  
+	
   @Inject
   private Messages messages;
-  
+	
   /**
    * Loads the general settings of the specified element.
    * @param element the element UUID
    * @return the element settings
    */
-  @GET
-  @Path("/{element:"+UUID_PATTERN+"}/settings")
-  public ElementSettings getElementSettings(@Valid @PathParam("element") ElementId element){
-    return service.getElementSettings(element);
-  }
+   @GET
+   @Path("/{element:"+UUID_PATTERN+"}/settings")
+   @Scopes({IVT, IVT_READ, IVT_ELEMENT,IVT_ELEMENT_SETTINGS})
+   public ElementSettings getElementSettings(@Valid @PathParam("element") ElementId element){
+     return service.getElementSettings(element);
+   }
 
   /**
    * Load the general settings of the specified element.
@@ -649,6 +677,7 @@ public class ElementSettingsResource{
    */
   @GET
   @Path("/{element}/settings")
+  @Scopes({IVT, IVT_READ, IVT_ELEMENT,IVT_ELEMENT_SETTINGS})
   public ElementSettings getElementSettings(@Valid @PathParam("element") ElementName element){
     return service.getElementSettings(element);
   }
@@ -662,7 +691,6 @@ public class ElementSettingsResource{
    */
   @PUT
   @Path("/{element:"+UUID_PATTERN+"}/settings")
-  @RolesAllowed({OPERATOR,SYSTEM})
   public Response storeElementSettings(@Valid @PathParam("element") ElementId element, 
                                        @Valid ElementSettings settings){
     
@@ -670,7 +698,7 @@ public class ElementSettingsResource{
       throw new UnprocessableEntityException(VAL0003E_IMMUTABLE_ATTRIBUTE, 
                                              "element_id", 
                                              element, 
-                                             settings.getElementId()); 
+                                             settings.getElementId());
     }
     
     try {
@@ -683,7 +711,6 @@ public class ElementSettingsResource{
     }
   }
   
-  
   /**
    * Stores the general settings of the specified element.
    * Creates a new element if the specified element does not exist.
@@ -693,9 +720,8 @@ public class ElementSettingsResource{
    */
   @PUT
   @Path("/{element}/settings")
-  @RolesAllowed({OPERATOR,SYSTEM})
   public Response storeElementSettings(@PathParam("element") ElementName element, 
-                                       @Valid ElementSettings settings){
+                     @Valid ElementSettings settings){
     try {
       if(service.storeElementSettings(settings)){
         return created(messages,"/elements/%s/settings",element);
@@ -706,17 +732,15 @@ public class ElementSettingsResource{
     }
   }
   
-  
   /**
    * Adds a new element or updates an existing element.
    * @param settings the element settings
    * @return a created response if a new element was created, a success response if the settings of an existing element have been updated
    */
   @POST
-  @RolesAllowed({OPERATOR,SYSTEM})
   public Response storeElementSettings(@Valid ElementSettings settings){
     return storeElementSettings(settings.getElementId(),
-                   settings);
+                                settings);
   }
 
   private PersistenceException resolveRootCause(PersistenceException p, ElementName elementName) {
@@ -730,10 +754,7 @@ public class ElementSettingsResource{
       throw p;
     }
   }
-  
-
 }
-
 ```
 
 ### Responses
@@ -811,7 +832,7 @@ The following module identifiers exist today:
 
 | Identifier | Module              |
 | :---------:| :------------------ |
-| IVT     	 | Resource Inventory  |
+| IVT        | Resource Inventory  |
 | JOB		 | Job Scheduler       |
 | BUS		 | Message Bus         |
 | WHK		 | Webhooks  		   |
@@ -915,7 +936,6 @@ private MetricService metric;
 ...
 @DELETE
 @Path("/{metric}")
-@RolesAllowed({OPERATOR,SYSTEM})
 public Response removeMetric(@PathParam("metric") MetricName metricName,
 						   @QueryParam("force") boolean force) {
   if(force) {
