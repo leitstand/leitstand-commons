@@ -15,10 +15,12 @@
  */
 package io.leitstand.commons.log;
 
+import static io.leitstand.commons.jsonb.IsoDateAdapter.parseIsoDate;
 import static io.leitstand.commons.log.DiagnosticContext.clear;
 import static io.leitstand.commons.log.DiagnosticContext.push;
 import static io.leitstand.commons.model.StringUtil.isEmptyString;
 import static java.lang.Thread.currentThread;
+import static java.time.Instant.ofEpochMilli;
 import static java.util.logging.Level.CONFIG;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
@@ -33,28 +35,37 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import io.leitstand.commons.jsonb.IsoDateAdapter;
 
 public class PatternFormatterTest {
 
 	
 	private LogRecord record;
 	
+	private TimeZone defaultZone;
+	
 	@Before
 	public void createRecord() {
+		defaultZone = TimeZone.getDefault();
+		// Make sure that all test use CET timezone
+		TimeZone.setDefault(TimeZone.getTimeZone("CET"));
 		record = new LogRecord(Level.WARNING, "Unit test");
 		record.setLoggerName("UnittestLogger");
 		record.setThreadID((int)currentThread().getId());
 		record.setThrown(new RuntimeException("unit test exception"));
-		record.setMillis(IsoDateAdapter.parseIsoDate("2019-05-22T00:16:46.460Z").getTime());
+		record.setInstant(ofEpochMilli(parseIsoDate("2019-05-22T00:16:46.460Z").getTime()));
 	}
 	
+	@After
+	public void restoreDefaultTimezone() {
+		TimeZone.setDefault(defaultZone);
+	}
 	
 	@Test
 	public void format_thread() {
