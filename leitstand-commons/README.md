@@ -946,6 +946,67 @@ public Response removeMetric(@PathParam("metric") MetricName metricName,
   return success(messages);
 }
 ```
+## Environment
+
+### Reading System Properties and Process Environment Variables
+
+The `Environment` class provides simple access to JVM system properties and process environment variables
+with precedence for JVM system properties.
+
+For example, the listing below reads the `LEITSTAND_ETC_ROOT` system property first and 
+scans the process environment for a `LEITSTAND_ETC_ROOT` variable, if the system property does not exist.
+The value defaults to `/etc/leitstand` if the environment variable does not exist either.
+ 
+```Java
+String dir = Environment.getSystemProperty("LEITSTAND_ETC_ROOT","/etc/leitstand");
+```
+
+### Accessing the Leitstand Configuration Directory
+The `LEITSTAND_ETC_ROOT` directory can be used to store configurations for Leitstand mnodules and applications.
+
+The `Environment` allows to read configuration files from the configuration directory.
+Say a _Leitstand Telemetry_ application wants to read the `GrafanaConfig` from the `grafana.yaml` file in the configuration directory ([Grafana](https://grafana.com) is a popular tool for metric visualization), then the environment can be used as follows to read the configuration:
+
+```Java
+import static io.leitstand.commons.etc.FileProcessor.yaml;
+...
+@Inject
+Environment env;
+...
+GrafanaConfig config = env.loadConfig("grafana.yaml",
+                                      yaml(GrafanaConfig.class),
+                                      () -> new GrafanaConfig());
+
+```
+
+The first parameter specifies the location of the file in the configuration directory.
+The second parameter specifies the processor to process the file.
+The specified yaml processor translates the `grafana.yaml` to a `GrafanaConfig` instance.
+The third parameter is optional and specifies the default configuration if the specified file does not exist.
+
+The following default `FileProcessor` implementations exist:
+
+- `properties()` loads `java.util.Properties` from a file.
+- `yaml()` loads a YAML file and translates is to a Java object or to a `Map` if the Java type is omitted.
+
+The `loadConfigs` method allows to iterate over all files in a directory.
+The listing below loads all `Contribution` configurations from the specified directory.
+
+```Java
+import static io.leitstand.commons.etc.FileProcessor.yaml;
+...
+@Inject
+Environment env;
+...
+List<Contribution> contribsd = env.loadConfig("contribs",
+										  f -> f.canRead() && f.isFile(), 
+                                      		  yaml(Contribution.class));
+```
+
+The first parameter specifies the directory to be scanned.
+The second parameter specifies a filter to select the files to be processed.
+The third parameter specifies the file processor to translate each selected file into a `Contribution` object.
+
 ## Logging
 
 Leitstand considers the target audiences of log messages by means of differentiating between _log_ and _trace_ information.

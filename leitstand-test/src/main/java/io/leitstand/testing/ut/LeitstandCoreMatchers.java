@@ -166,7 +166,6 @@ public class LeitstandCoreMatchers {
 		};
 	}
 	
-	
 	public static <T extends Collection<?>> Matcher<T> hasSizeOf(int size){
 		return new BaseMatcher<T>(){
 

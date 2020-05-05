@@ -8,10 +8,6 @@ dependencies {
     compile 'com.github.spullara.mustache.java:compiler:0.9.5'
 
     compile project(':leitstand-commons')
-    compile project(':leitstand-etc')
-
-    compile project(':leitstand-commons')
-    compile project(':leitstand-etc')
 	
     testCompile 'junit:junit:4.12'
     testCompile 'org.glassfish:javax.json:1.1.4'

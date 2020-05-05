@@ -4,8 +4,10 @@ plugins {
 }
 
 dependencies {
+    compile 'org.yaml:snakeyaml:1.19'
     compileOnly 'javax:javaee-api:8.0'
     compileOnly 'org.postgresql:postgresql:42.2.5'
+
 
     testCompile 'junit:junit:4.12'
     testCompile 'javax:javaee-api:8.0'

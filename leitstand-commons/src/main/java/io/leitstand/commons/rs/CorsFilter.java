@@ -15,6 +15,9 @@
  */
 package io.leitstand.commons.rs;
 
+import static io.leitstand.commons.etc.Environment.getSystemProperty;
+import static io.leitstand.commons.model.StringUtil.isNonEmptyString;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -26,17 +29,27 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * A filter to set HTTP caching directives to disable caching of REST API responses.
+ * A filter to set HTTP caching directives to disable invocations of all REST API invocations.
+ *
  */
-@WebFilter(urlPatterns="/api/*")
-public class CacheControlFilter implements Filter{
+@WebFilter(urlPatterns= {"/api/*","/ui/*"})
+public class CorsFilter implements Filter{
 
+	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "LEITSTAND_ACCESS_CONTROL_ALLOW_ORIGIN";
+	
+	//TODO Add logging
+	//TODO Add Environment variable (disabled by default)
+	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		HttpServletResponse httpResponse = (HttpServletResponse)response;
-		httpResponse.addHeader("Cache-Control","no-cache");
-		httpResponse.addHeader("Pragma", "no-cache");
+		String accessControlAllowOrigin = getSystemProperty(ACCESS_CONTROL_ALLOW_ORIGIN);
+		if(isNonEmptyString(accessControlAllowOrigin)) {
+			HttpServletResponse httpResponse = (HttpServletResponse)response;
+			httpResponse.addHeader("Access-Control-Allow-Origin","*");
+			httpResponse.addHeader("Access-Control-Allow-Credentials", "true");
+		}
+		
 		chain.doFilter(request, response);
 	}
 

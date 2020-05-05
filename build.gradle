@@ -6,23 +6,7 @@ def allTestCoverageFile = "$buildDir/jacoco/allTestCoverage.exec"
 
 allprojects {
 
-    task version(type: Exec) {
-        println 'Resolve version for project ' + project.getName()
-        def stdout = new ByteArrayOutputStream()
-        def rc = exec {
-            commandLine 'git', 'describe', '--tags'
-            standardOutput = stdout
-            ignoreExitValue true
-        }
-        if (rc.exitValue == 0) {
-            version = stdout.toString().trim()
-        } else {
-            println 'WARNING: No version information available. Version defaults to 0.0.0-develop'
-            version = '0.0.0-develop'
-        }
-        println 'Project version: ' + version
-        project.setVersion(version)
-    }
+
 
     group = 'io.leitstand'
     // Activate jacoco for all modules to measure unit test code coverage

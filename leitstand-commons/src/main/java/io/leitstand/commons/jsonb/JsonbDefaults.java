@@ -15,6 +15,7 @@
  */
 package io.leitstand.commons.jsonb;
 
+import static java.lang.Boolean.FALSE;
 import static javax.json.bind.JsonbBuilder.newBuilder;
 import static javax.json.bind.config.PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES;
 
@@ -48,6 +49,7 @@ public class JsonbDefaults implements ContextResolver<Jsonb> {
 
 	static {
         JsonbConfig config = new JsonbConfig()
+        					 .withNullValues(FALSE)
 				 			 .withPropertyVisibilityStrategy(new FieldAccessVisibilityStrategy())
 				 			 .withPropertyNamingStrategy(LOWER_CASE_WITH_UNDERSCORES)
 				 			 .withEncoding("utf8")
