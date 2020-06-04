@@ -77,6 +77,7 @@ public class ApiResources extends Application {
 		resources.add(ValidationExceptionMapper.class);
 		resources.add(IsoDateAdapter.class);
 		resources.add(MessagesMessageBodyWriter.class);
+		resources.add(RollbackExceptionMapper.class);
 		resources.add(JsonbDefaults.class);
 		resources.add(IsoDateParamConverterProvider.class);
 	}
