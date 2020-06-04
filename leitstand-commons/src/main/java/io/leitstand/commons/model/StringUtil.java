@@ -33,6 +33,13 @@ public final class StringUtil {
 		return s == null || s.isEmpty();
 	}
 
+	public static String trim(String s) {
+		if(s != null) {
+			return s.trim();
+		}
+		return null;
+	}
+	
 	public static <T> String asString(T o, 
 									  Function<T,String> m,
 									  String defaultString) {

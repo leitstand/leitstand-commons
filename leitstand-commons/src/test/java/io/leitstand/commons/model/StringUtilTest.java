@@ -18,8 +18,10 @@ package io.leitstand.commons.model;
 import static io.leitstand.commons.model.StringUtil.asString;
 import static io.leitstand.commons.model.StringUtil.isEmptyString;
 import static io.leitstand.commons.model.StringUtil.isNonEmptyString;
+import static io.leitstand.commons.model.StringUtil.trim;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.security.Principal;
@@ -30,6 +32,19 @@ import org.junit.Test;
 
 public class StringUtilTest {
 
+	
+	@Test
+	public void trim_returns_null_for_null_values() {
+		assertNull(trim(null));
+	}
+	
+	@Test
+	public void trim_returns_empty_string_for_whitespaces() {
+		assertTrue(trim("   ").isEmpty());
+		assertTrue(trim("\t").isEmpty());
+		assertTrue(trim("\n").isEmpty());
+
+	}
 	
 	@Test
 	public void null_is_empty_string() {
