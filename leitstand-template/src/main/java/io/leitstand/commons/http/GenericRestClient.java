@@ -16,32 +16,56 @@
 package io.leitstand.commons.http;
 
 import static io.leitstand.commons.json.MapUnmarshaller.unmarshal;
-import static javax.ws.rs.client.ClientBuilder.newClient;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static javax.ws.rs.client.ClientBuilder.newBuilder;
 import static javax.ws.rs.client.Entity.json;
 
 import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Response;
 
+import io.leitstand.commons.jsonb.JsonbDefaults;
 import io.leitstand.commons.template.Template;
 
 public class GenericRestClient {
 	
 	private URI endpoint;
 	private String token;
+	private int readTimeout;
+	private TimeUnit readTimeoutUnit;
+	private int connectTimeout;
+	private TimeUnit connectTimeoutUnit;
 	
 	public GenericRestClient(URI endpoint) {
 		this.endpoint = endpoint;
+		this.readTimeout = 10;
+		this.readTimeoutUnit = SECONDS;
+		this.connectTimeout =2;
+		this.connectTimeoutUnit = SECONDS;
 	}
 	
+	public GenericRestClient readTimeout(int timeout, TimeUnit unit) {
+		this.readTimeout = timeout;
+		this.readTimeoutUnit = unit;
+		return this;
+	}
+	
+	public GenericRestClient connectTimeout(int timeout, TimeUnit unit) {
+		this.connectTimeout = timeout;
+		this.connectTimeoutUnit = unit;
+		return this;
+	}
+
 	public void setAuthorizationHeader(String token) {
 		this.token = token;
 	}
@@ -76,9 +100,15 @@ public class GenericRestClient {
 	}
 	
 	public Response invoke(JsonRequest request){
-		Builder call = newClient()
-					  .target(endpoint + request.getPath())
-					  .request();
+		Client client = newBuilder()
+					 	.readTimeout(readTimeout,readTimeoutUnit)
+					 	.connectTimeout(connectTimeout,connectTimeoutUnit)
+					 	.register(new JsonbDefaults())
+					 	.build();
+					
+		Builder call = client    
+					   .target(endpoint + request.getPath())
+					   .request();
 		for(Map.Entry<String, Object> header : request.getHeaders().entrySet()) {
 			call.header(header.getKey(),
 					    header.getValue());
@@ -86,7 +116,7 @@ public class GenericRestClient {
 		if(token != null) {
 			call.header("Authorization", token);
 		}
-		
+
 		switch(request.getMethod()) {
 			case GET: return call.get();
 			case PUT: return call.put(json(request.getBody().toString()));
