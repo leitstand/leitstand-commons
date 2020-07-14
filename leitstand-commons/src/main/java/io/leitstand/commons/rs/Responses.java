@@ -67,11 +67,17 @@ public final class Responses {
 
 	
 	public static Response accepted(Messages messages) {
-		if(messages.isEmpty()) {
+		if(messages == null || messages.isEmpty()) {
 			return Response.accepted().build();
 		}
 		return Response.accepted(messages).build();
-		
+	}
+
+	public static Response accepted(Object entity) {
+	    if(entity != null) {
+	        return Response.accepted(entity).build();
+	    }
+	    return Response.accepted().build();
 	}
 	
 	public static Response success(Messages messages) {
