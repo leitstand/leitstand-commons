@@ -15,32 +15,43 @@
  */
 package io.leitstand.commons.jsonb;
 
-import static java.util.Calendar.APRIL;
+import static io.leitstand.commons.jsonb.IsoDateAdapter.ISO_FORMAT;
+import static java.util.Calendar.AUGUST;
+import static java.util.Calendar.DST_OFFSET;
 import static java.util.Calendar.MILLISECOND;
+import static java.util.Calendar.ZONE_OFFSET;
+import static java.util.Calendar.getInstance;
+import static java.util.TimeZone.getTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class IsoDateAdapterTest {
 	
-	private IsoDateAdapter adapter = new IsoDateAdapter();
+	private IsoDateAdapter adapter;
 	private Date ref;
 	private String iso;
 	
 	@Before
 	public void initDates() {
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = getInstance();
+		cal.setTimeZone(getTimeZone("GMT"));
+		cal.set(ZONE_OFFSET, 36000000);
+		cal.set(DST_OFFSET,3600000);
 		cal.setTimeInMillis(0);
-		cal.set(1981,APRIL,26,19,32,05);
+		cal.set(2020,AUGUST,3,14,32,05);
 		cal.add(MILLISECOND,150);
 		ref = cal.getTime();
-		iso = new SimpleDateFormat(IsoDateAdapter.ISO_FORMAT).format(ref);
+		iso = "2020-08-03T16:32:05.150+02:00";
+		adapter = new IsoDateAdapter();
 	}
 	
 	
