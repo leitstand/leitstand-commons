@@ -19,8 +19,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Publish to bintray leitstand/leitstand-mvn
-      run: ./gradlew publish
-      env:
-        BINTRAY_TOKEN: ${{ secrets.BINTRAY_TOKEN }}
-      
+    - name: Publish build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Package
+        path: build/libs      
