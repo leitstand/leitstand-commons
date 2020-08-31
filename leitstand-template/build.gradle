@@ -5,16 +5,25 @@ plugins {
 
 dependencies {
     compileOnly 'javax:javaee-api:8.0'
-    compile 'com.github.spullara.mustache.java:compiler:0.9.5'
+    implementation 'com.github.spullara.mustache.java:compiler:0.9.5'
 
-    compile project(':leitstand-commons')
+    implementation project(':leitstand-commons')
 	
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.glassfish:javax.json:1.1.4'
-    testCompile 'org.eclipse:yasson:1.0.3'
-    testCompile 'org.mockito:mockito-all:1.8.4'
-    testCompile 'org.glassfish.jersey.core:jersey-client:2.7'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-all:1.8.4'
+    testImplementation 'org.glassfish:javax.json:1.1.4'
+    testCompileOnly 'javax:javaee-api:8.0'
+    testRuntimeOnly 'org.eclipse:yasson:1.0.3'
+    testRuntimeOnly 'org.glassfish.jersey.core:jersey-client:2.7'
 	
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+    javadoc {
+        failOnError = false
+    }
 }
 
 publishing {

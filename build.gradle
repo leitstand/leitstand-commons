@@ -6,40 +6,13 @@ def allTestCoverageFile = "$buildDir/jacoco/allTestCoverage.exec"
 
 allprojects {
 
-    task version(type: Exec) {
-	def version = findProperty('versions.leitstand-commons')
-	println 'Project version ('+project.name+'): ' + version
-        project.setVersion(version)
-    }
-
     group = 'io.leitstand'
     // Activate jacoco for all modules to measure unit test code coverage
     apply plugin: 'jacoco'
     apply plugin: 'java'
     apply plugin: 'maven-publish'
 
-    repositories {
-        jcenter()
-        mavenLocal()
-    }
-
-    publishing {
-        repositories {
-            mavenLocal()
-            maven {
-                name = "Leitstand"
-                url = uri("https://dl.bintray.com/leitstand/leitstand-mvn")
-                credentials(HttpHeaderCredentials) {
-                    name  = "Authorization"
-                    value = "Bearer "+System.getenv("BINTRAY_TOKEN")
-                }
-                authentication {
-                    header(HttpHeaderAuthentication)
-                }
-           }
-        }
-    }
-}
+ }
 
 jacoco {
     toolVersion = '0.8.1'
@@ -66,6 +39,24 @@ sonarqube {
 }
 
 subprojects {
+
+    task version(type: Exec) {
+	    def version = findProperty('versions.leitstand-commons')
+	    println 'Project version ('+project.name+'): ' + version
+        project.setVersion(version)
+    }
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    publishing {
+        repositories {
+            mavenLocal()
+        }
+    }
+
     sonarqube {
         properties {
             property 'sonar.sources', 'src/main/java'
