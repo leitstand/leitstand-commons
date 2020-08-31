@@ -4,21 +4,29 @@ plugins {
 }
 
 dependencies {
-    compile 'org.yaml:snakeyaml:1.19'
+    api 'org.yaml:snakeyaml:1.19'
     compileOnly 'javax:javaee-api:8.0'
     compileOnly 'org.postgresql:postgresql:42.2.5'
 
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'javax:javaee-api:8.0'
-    testCompile 'org.mockito:mockito-all:1.8.4'
-    testCompile 'com.h2database:h2:1.4.200'
-    testCompile 'org.glassfish:javax.json:1.1.4'
-    testCompile 'org.postgresql:postgresql:42.2.5'
-    testCompile 'org.glassfish.jersey.core:jersey-client:2.7'
-    testCompile 'org.hibernate:hibernate-validator:4.2.0.Final'
-    testCompile 'org.eclipse:yasson:1.0.3'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-all:1.8.4'
+    testImplementation 'javax:javaee-api:8.0'
+    testImplementation 'org.postgresql:postgresql:42.2.5'
+    testImplementation 'org.glassfish:javax.json:1.1.4'
+    testRuntimeOnly 'com.h2database:h2:1.4.200'
+    testRuntimeOnly 'org.glassfish.jersey.core:jersey-client:2.7'
+    testRuntimeOnly 'org.hibernate:hibernate-validator:4.2.0.Final'
+    testRuntimeOnly 'org.eclipse:yasson:1.0.3'
 
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+    javadoc {
+        failOnError = false
+    }
 }
 
 publishing {
