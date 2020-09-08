@@ -116,5 +116,21 @@ public class AbstractEntity implements Serializable{
 	protected void touchLastModified() {
 		this.dateModified = new Date();
 	}
+	
+	/**
+	 * Sets the creation date of this entity.
+	 * @param dateCreated the creation date of this entity
+	 */
+	protected void setDateCreated(Date dateCreated) {
+        this.dateCreated = new Date(dateCreated.getTime());
+	}
+	
+	/**
+	 * Sets the modification date of this date.
+	 * @param dateModified the last modification date.
+	 */
+	protected void setDateModified(Date dateModified) {
+	    this.dateModified = new Date(dateModified.getTime());
+	}
 
 }
