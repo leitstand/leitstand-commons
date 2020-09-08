@@ -16,11 +16,25 @@
 package io.leitstand.commons.rs;
 
 import static io.leitstand.commons.jsonb.IsoDateAdapter.parseIsoDate;
+import static java.lang.String.format;
+import static java.net.URLEncoder.encode;
 
+import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public final class ResourceUtil {
-
+    
+    public static String encodeUri(String s, Object... args) {
+        try {
+            return encode(format(s, args), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Compiler
+            // All JVMs are required to support UTF-8.
+            throw new UncheckedIOException(e);
+        }
+    }
+    
 	public static int tryParseInt(String s, int defaultValue) {
 		if(s == null || s.isEmpty()) {
 			return defaultValue;
