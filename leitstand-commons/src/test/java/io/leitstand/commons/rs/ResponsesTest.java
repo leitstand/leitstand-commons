@@ -18,13 +18,16 @@ package io.leitstand.commons.rs;
 import static io.leitstand.commons.rs.Responses.accepted;
 import static io.leitstand.commons.rs.Responses.created;
 import static io.leitstand.commons.rs.Responses.success;
+import static java.net.URLEncoder.encode;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import javax.ws.rs.core.Response;
 
@@ -119,6 +122,5 @@ public class ResponsesTest {
 		assertEquals(HTTP_ACCEPTED,response.getStatus());
 		assertNull(response.getEntity());
 	}
-	
 	
 }

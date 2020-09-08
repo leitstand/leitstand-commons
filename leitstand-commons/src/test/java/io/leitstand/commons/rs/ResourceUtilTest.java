@@ -15,6 +15,7 @@
  */
 package io.leitstand.commons.rs;
 
+import static io.leitstand.commons.rs.ResourceUtil.encodeUri;
 import static io.leitstand.commons.rs.ResourceUtil.tryParseInt;
 import static org.junit.Assert.assertEquals;
 
@@ -22,6 +23,10 @@ import org.junit.Test;
 
 public class ResourceUtilTest {
 
+    @Test
+    public void encode_blanks() {
+        assertEquals("a+b+c",encodeUri("a b c"));
+    }
 	
 	@Test
 	public void null_string_is_translated_to_default_value() {

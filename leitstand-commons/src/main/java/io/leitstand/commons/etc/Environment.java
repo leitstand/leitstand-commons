@@ -15,7 +15,6 @@
  */
 package io.leitstand.commons.etc;
 
-import static io.leitstand.commons.etc.FileProcessor.yaml;
 import static io.leitstand.commons.model.StringUtil.isNonEmptyString;
 import static java.lang.String.format;
 import static java.lang.System.getenv;
@@ -34,9 +33,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

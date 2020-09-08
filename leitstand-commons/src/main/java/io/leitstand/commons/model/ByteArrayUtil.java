@@ -22,7 +22,6 @@ import static java.util.Base64.getUrlDecoder;
 import static java.util.Base64.getUrlEncoder;
 
 import java.math.BigInteger;
-import java.util.Base64;
 
 /**
  * A bunch of byte array utilities.
