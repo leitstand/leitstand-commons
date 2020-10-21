@@ -74,6 +74,7 @@ public class ApiResources extends Application {
 		resources.add(EntityNotFoundExceptionMapper.class);
 		resources.add(OptimisticLockExceptionMapper.class);
 		resources.add(UnprocessableEntityExceptionMapper.class);
+		resources.add(InternalServerErrorExceptionMapper.class);
 		resources.add(ValidationExceptionMapper.class);
 		resources.add(IsoDateAdapter.class);
 		resources.add(MessagesMessageBodyWriter.class);
