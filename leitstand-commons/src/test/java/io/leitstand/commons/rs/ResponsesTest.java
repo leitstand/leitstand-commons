@@ -17,17 +17,20 @@ package io.leitstand.commons.rs;
 
 import static io.leitstand.commons.rs.Responses.accepted;
 import static io.leitstand.commons.rs.Responses.created;
+import static io.leitstand.commons.rs.Responses.eofHeader;
+import static io.leitstand.commons.rs.Responses.limitHeader;
+import static io.leitstand.commons.rs.Responses.offsetHeader;
+import static io.leitstand.commons.rs.Responses.seeOther;
+import static io.leitstand.commons.rs.Responses.sizeHeader;
 import static io.leitstand.commons.rs.Responses.success;
-import static java.net.URLEncoder.encode;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -36,12 +39,14 @@ import org.junit.Test;
 
 import io.leitstand.commons.messages.Messages;
 
+@SuppressWarnings("unchecked")
 public class ResponsesTest {
 
 	private static final int HTTP_NO_CONTENT = 204;
 	private static final int HTTP_OK = 200;
 	private static final int HTTP_ACCEPTED = 202;
 	private static final int HTTP_CREATED = 201;
+    private static final int HTTP_SEE_OTHER = 303;
 	
 	private Messages messages;
 	
@@ -123,4 +128,73 @@ public class ResponsesTest {
 		assertNull(response.getEntity());
 	}
 	
+	@Test
+	public void decorate_success_response_with_headers() {
+	    Response response = success("test", r -> r.header("header", "value"));
+	    assertEquals(HTTP_OK,response.getStatus());
+	    assertEquals("value",response.getHeaderString("header"));
+	}
+	
+    @Test
+    public void decorate_empty_success_response_with_headers() {
+        Response response = success(null, r -> r.header("header", "value"));
+        assertEquals(HTTP_NO_CONTENT,response.getStatus());
+        assertEquals("value",response.getHeaderString("header"));
+    }
+    
+    @Test
+    public void create_accepted_response() {
+        Response response = accepted(messages);
+        assertEquals(HTTP_ACCEPTED,response.getStatus());
+    }
+    
+    @Test
+    public void decorate_accepted_response_with_headers() {
+        Response response = accepted(messages, r -> r.header("header", "value"));
+        assertEquals(HTTP_ACCEPTED,response.getStatus());
+        assertEquals("value",response.getHeaderString("header"));
+    }
+    
+    @Test
+    public void create_seeother_response() {
+        Response response = seeOther("/foo/bar",messages);
+        assertEquals(HTTP_SEE_OTHER,response.getStatus());
+        assertEquals(URI.create("/foo/bar"),response.getLocation());
+    }
+    
+    @Test
+    public void decorate_seeother_response_with_headers() {
+        Response response = seeOther("/foo/bar", r -> r.header("header", "value"));
+        assertEquals(HTTP_SEE_OTHER,response.getStatus());
+        assertEquals(URI.create("/foo/bar"),response.getLocation());
+        assertEquals("value",response.getHeaderString("header"));
+    }
+    
+    @Test
+    public void decorate_success_with_leistand_headers() {
+        
+        Response response = success(null,
+                                    offsetHeader(200),
+                                    limitHeader(100),
+                                    sizeHeader(73),
+                                    eofHeader(true));
+        
+        assertEquals(200,intHeader(response,"Leitstand-Offset"));
+        assertEquals(100,intHeader(response,"Leitstand-Limit"));
+        assertEquals(73,intHeader(response,"Leitstand-Size"));
+        assertEquals(true,booleanHeader(response,"Leitstand-Eof"));
+        
+        
+    }
+	
+    static int intHeader(Response response, String name) {
+        List<Object> values = (List<Object>) response.getHeaders().get(name);
+        return (Integer) values.get(0);
+    }
+    
+    static boolean booleanHeader(Response response, String name) {
+        List<Object> values = (List<Object>) response.getHeaders().get(name);
+        return (Boolean) values.get(0);
+    }
+    
 }
