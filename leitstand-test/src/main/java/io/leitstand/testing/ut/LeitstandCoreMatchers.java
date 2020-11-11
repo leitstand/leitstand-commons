@@ -26,6 +26,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import javax.ws.rs.core.Response;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -212,6 +214,28 @@ public class LeitstandCoreMatchers {
 			}
 
 		};
+	}
+	
+	public static Matcher<Response> containsHeader(String name, Object value){
+	    return new BaseMatcher<Response>(){
+
+            @Override
+            public boolean matches(Object item) {
+                Response response = (Response) item;
+                
+                List<Object> header = response.getHeaders().get(name);
+                if(header == null || header.isEmpty()) {
+                    return false;
+                }
+                return Objects.equals(value, header.get(0));
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Header "+name+" does not match or does not exist!");
+            }
+	        
+	    };
 	}
 	
 	public static <E,T extends Collection<E>> Matcher<T> contains(Predicate<E> predicate){
