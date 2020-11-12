@@ -16,10 +16,13 @@
 package io.leitstand.commons.rs;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 
 import java.net.URI;
-import java.util.function.UnaryOperator;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -27,22 +30,34 @@ import io.leitstand.commons.messages.Messages;
 
 public final class Responses {
     
-    public static UnaryOperator<ResponseBuilder> offsetHeader(int offset){
+    @FunctionalInterface
+    public static interface Decorator {
+        ResponseBuilder decorate(ResponseBuilder response);
+    }
+    
+    public static Decorator offsetHeader(int offset){
         return b -> b.header("Leitstand-Offset", offset);
     }
     
-    public static UnaryOperator<ResponseBuilder> limitHeader(int limit){
+    public static Decorator limitHeader(int limit){
         return b -> b.header("Leitstand-Limit", limit);
     }
     
-    public static UnaryOperator<ResponseBuilder> sizeHeader(int size){
+    public static Decorator sizeHeader(int size){
         return b -> b.header("Leitstand-Size", size);
     }
     
-    public static UnaryOperator<ResponseBuilder> eofHeader(boolean eof){
+    public static Decorator eofHeader(boolean eof){
         return b -> b.header("Leitstand-Eof", eof);
     }
     
+    public static Decorator contentType(String mimeType){
+        return b -> b.type(mimeType);
+    }
+    
+    public static Decorator contentType(MediaType mimeType){
+        return b -> b.type(mimeType);
+    }
 
 	public static Response created(Messages messages, String template, Object...args ) {
 		return created(messages,
@@ -54,27 +69,29 @@ public final class Responses {
 	}
 	
 	public static Response created(Object uri) {
-		return created(URI.create(uri.toString()),new UnaryOperator[0]);
+		return created(URI.create(uri.toString()),new Decorator[0]);
 	}
 
 	public static Response created(Messages messages, Object uri) {
 		return created(messages,URI.create(uri.toString()));
 	}
 	
-	public static Response created(URI uri, UnaryOperator<ResponseBuilder>... decorators) {
-		return decorated(Response.created(uri),decorators);
+	public static Response created(URI uri, Decorator... decorators) {
+		return decorated(Response.created(uri),
+		                 decorators);
 	}
 	
 	public static Response seeOther(String template, Object...args ) {
 		return seeOther(URI.create(format(template, args)));
 	}
 	
-	public static Response seeOther(Object uri, UnaryOperator<ResponseBuilder>... decorators) {
+	public static Response seeOther(Object uri, Decorator... decorators) {
 		return seeOther(URI.create(uri.toString()),decorators);
 	}
 	
-	public static Response seeOther(URI uri, UnaryOperator<ResponseBuilder>... decorators) {
-		return decorated(Response.seeOther(uri),decorators);
+	public static Response seeOther(URI uri, Decorator... decorators) {
+		return decorated(Response.seeOther(uri),
+		                 decorators);
 	}
 	
 	public static Response created(Messages messages, URI uri) {
@@ -85,48 +102,56 @@ public final class Responses {
 	}
 
 	
-	public static Response accepted(Messages messages, UnaryOperator<ResponseBuilder>... decorators) {
+	public static Response accepted(Messages messages, Decorator... decorators) {
 		if(messages == null || messages.isEmpty()) {
-			return decorated(Response.accepted(),decorators);
+			return decorated(Response.accepted(),
+			                 decorators);
 		}
-		return decorated(Response.accepted(messages),decorators);
+		return decorated(Response.accepted(messages),
+		                 decorators);
 	}
 
-	public static Response accepted(Object entity, UnaryOperator<ResponseBuilder>... decorators) {
-	    return decorated(Response.accepted(entity),decorators);
+	public static Response accepted(Object entity, Decorator... decorators) {
+	    return decorated(Response.accepted(entity),
+	                     decorators);
 	}
 	
-	public static Response success(Messages messages, UnaryOperator<ResponseBuilder>... decorators) {
+	public static Response success(Messages messages, Decorator... decorators) {
 		if(messages == null || messages.isEmpty()){
-		    return decorated(Response.noContent(),decorators);
+		    return decorated(Response.noContent(),
+		                     decorators);
 		}
-		return decorated(Response.ok(messages),decorators);
+		return decorated(Response.ok(messages),
+		                 decorators);
 	}
 
     private static Response decorated(ResponseBuilder b,
-            UnaryOperator<ResponseBuilder>... decorators) {
-        for(UnaryOperator<ResponseBuilder> decorator : decorators) {
-	        b = decorator.apply(b);
+                                      Decorator... decorators) {
+        for(Decorator decorator : decorators) {
+	        b = decorator.decorate(b);
 	    }
 	    return b.build();
     }
     
-	public static Response success(Object entity, UnaryOperator<ResponseBuilder>... decorators) {
+	public static Response success(Object entity, Decorator... decorators) {
 		if(entity != null) {
-		    return decorated(Response.ok(entity), decorators);
+		    return decorated(Response.ok(entity), 
+		                     decorators);
 		}
-		return decorated(Response.noContent(),decorators);
+		return decorated(Response.noContent(), 
+		                 decorators);
 	}
 	
-	public static Response success(Object entity, String contentType, UnaryOperator<ResponseBuilder>... decorators) {
-		if(entity == null) {
-			return decorated(Response.noContent(),decorators);
-		}
-		return decorated(Response.ok(entity,contentType),decorators);
+	public static Response success(Object entity, String contentType, Decorator... decorators) {
+	    List<Decorator> d = new LinkedList<>();
+	    d.add(contentType(contentType));
+	    d.addAll(asList(decorators));
+	    return success(entity,d.toArray(new Decorator[d.size()]));
 	}
 	
-	public static Response noContent(UnaryOperator<ResponseBuilder>... decorators) {
-	    return decorated(Response.noContent(),decorators);
+	public static Response noContent(Decorator... decorators) {
+	    return decorated(Response.noContent(),
+	                     decorators);
 	}
 	
 	private Responses() {

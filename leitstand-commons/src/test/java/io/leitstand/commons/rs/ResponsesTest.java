@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
@@ -185,6 +186,19 @@ public class ResponsesTest {
         assertEquals(true,booleanHeader(response,"Leitstand-Eof"));
         
         
+    }
+    
+    @Test
+    public void success_with_custom_mime_type() {
+        Response response = success(null,"text/plain");
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getMediaType());
+    }
+    
+    @Test
+    public void decorated_success_with_custom_mime_type() {
+        Response response = success(null,"text/plain",b -> b.header("foo", "bar"));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getMediaType());
+        assertEquals("bar",response.getHeaderString("foo"));
     }
 	
     static int intHeader(Response response, String name) {
