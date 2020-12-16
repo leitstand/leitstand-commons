@@ -16,8 +16,10 @@
 package io.leitstand.commons.http;
 
 import static io.leitstand.commons.json.MapUnmarshaller.unmarshal;
+import static io.leitstand.commons.model.StringUtil.isEmptyString;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.client.ClientBuilder.newBuilder;
+import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.client.Entity.json;
 
 import java.io.StringReader;
@@ -31,10 +33,12 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Response;
 
 import io.leitstand.commons.jsonb.JsonbDefaults;
+import io.leitstand.commons.model.StringUtil;
 import io.leitstand.commons.template.Template;
 
 public class GenericRestClient {
@@ -70,7 +74,7 @@ public class GenericRestClient {
 		this.token = token;
 	}
 	
-	public <T extends JsonStructure> T submit(JsonRequest request) {
+	public <T extends JsonStructure> T submit(Request request) {
 		String raw = submit(request,String.class);
 		if(raw == null || raw.isEmpty()) {
 			return null;
@@ -80,14 +84,14 @@ public class GenericRestClient {
 		}
 	}
 	
-	public <T> T submit(JsonRequest request, Template<T> responseMapping) {
+	public <T> T submit(Request request, Template<T> responseMapping) {
 		JsonObject raw = submit(request);
 		Map<String,Object> model = unmarshal(raw).toMap();
 		return responseMapping.apply(model);
 	}
 	
-	public <T> T submit(Map<String,Object> model, Template<JsonRequest> requestTemplate, Template<T> responseTemplate) {
-		JsonRequest request = requestTemplate.apply(model);
+	public <T> T submit(Map<String,Object> model, Template<Request> requestTemplate, Template<T> responseTemplate) {
+		Request request = requestTemplate.apply(model);
 		JsonObject raw = submit(request);
 		Map<String,Object> env = new HashMap<>();
 		env.putAll(model);
@@ -95,11 +99,11 @@ public class GenericRestClient {
 		return responseTemplate.apply(env);
 	}
 
-	public <T> T submit(JsonRequest request, Class<T> responseEntity) {
+	public <T> T submit(Request request, Class<T> responseEntity) {
 		return invoke(request).readEntity(responseEntity);
 	}
 	
-	public Response invoke(JsonRequest request){
+	public Response invoke(Request request){
 		Client client = newBuilder()
 					 	.readTimeout(readTimeout,readTimeoutUnit)
 					 	.connectTimeout(connectTimeout,connectTimeoutUnit)
@@ -119,11 +123,21 @@ public class GenericRestClient {
 
 		switch(request.getMethod()) {
 			case GET: return call.get();
-			case PUT: return call.put(json(request.getBody().toString()));
+			case PUT: return call.put(entity(request.getBody(),
+			                                 contentType(request)));
 			case DELETE: return call.delete();
 			case POST:
-			default: return call.post(json(request.getBody().toString()));
+			default: return call.post(entity(request.getBody(),
+			                                 contentType(request)));
 		}
+	}
+	
+	private String contentType(Request request) {
+	    String contentType = request.getHeader("Content-Type");
+	    if(isEmptyString(contentType)){
+	        return "application/json";
+	    }
+	    return contentType;
 	}
 
 	public URI getEndpoint() {
