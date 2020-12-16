@@ -149,5 +149,5 @@ public class MapMarshallerTest {
 		assertEquals("item 2", array.getJsonObject(1).getString("name"));
 		
 	}
-	
+		
 }

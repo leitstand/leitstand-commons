@@ -22,16 +22,34 @@ import java.io.StringReader;
 
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonValue;
 
 /**
  * A utility to convert a Java object to a JSON object.
  */
 public final class JsonMarshaller {
 
+    /**
+     * Converts a Java String to a JSON string.
+     * Returns <code>null</code> if the specified string is <code>null</code>.
+     * @param string the Java string
+     * @return the JSON string
+     */
+    public static JsonValue marshal(String string) {
+        if(string == null) {
+            return null;
+        }
+        String json = jsonb().toJson(string);
+        try(StringReader buffer = new StringReader(json);
+            JsonReader reader = createReader(buffer)){
+            return reader.readValue();
+        }
+    }
+    
 	/**
 	 * Converts a Java object to a JSON object.
 	 * Returns <code>null</code> if the specified object is <code>null</code>.
-	 * @param object the java object
+	 * @param object the Java object
 	 * @return the JSON object
 	 */
 	public static JsonObject marshal(Object object) {

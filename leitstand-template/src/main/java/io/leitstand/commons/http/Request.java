@@ -15,14 +15,12 @@
  */
 package io.leitstand.commons.http;
 
-import static io.leitstand.commons.http.JsonRequest.HttpMethod.DELETE;
-import static io.leitstand.commons.http.JsonRequest.HttpMethod.GET;
-import static io.leitstand.commons.http.JsonRequest.HttpMethod.POST;
-import static io.leitstand.commons.http.JsonRequest.HttpMethod.PUT;
-import static io.leitstand.commons.json.JsonMarshaller.marshal;
-import static io.leitstand.commons.json.MapMarshaller.marshal;
-import static io.leitstand.commons.json.MapUnmarshaller.unmarshal;
+import static io.leitstand.commons.http.Request.HttpMethod.DELETE;
+import static io.leitstand.commons.http.Request.HttpMethod.GET;
+import static io.leitstand.commons.http.Request.HttpMethod.POST;
+import static io.leitstand.commons.http.Request.HttpMethod.PUT;
 import static io.leitstand.commons.jsonb.IsoDateAdapter.isoDateFormat;
+import static io.leitstand.commons.jsonb.JsonProcessor.unmarshal;
 import static io.leitstand.commons.model.BuilderUtil.assertNotInvalidated;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -33,17 +31,18 @@ import java.util.Map;
 
 import javax.json.JsonObject;
 
-import io.leitstand.commons.jsonb.JsonProcessor;
+import io.leitstand.commons.json.JsonMarshaller;
+import io.leitstand.commons.json.MapMarshaller;
 
-public class JsonRequest {
+public class Request {
 	
-	public static Builder newJsonRequest() {
+	public static Builder newRequest() {
 		return new Builder();
 	}
 	
 	public static class Builder {
 		
-		private JsonRequest request = new JsonRequest();
+		private Request request = new Request();
 		
 		public Builder withMethod(HttpMethod method) {
 			assertNotInvalidated(getClass(), request);
@@ -83,21 +82,29 @@ public class JsonRequest {
 			return this;
 		}
 		
+		public Builder withBody(String body) {
+	        assertNotInvalidated(getClass(), request);
+            request.body = body;
+            return this;
+		}
+		
 		public Builder withBody(Object body) {
-			return withBody(marshal(body));
-		}
-		
-		public Builder withBody(JsonObject body) {
-			return withBody(unmarshal(body).toMap());
-		}
-		
-		public Builder withBody(Map<String,Object> body) {
-			assertNotInvalidated(getClass(), request);
+			assertNotInvalidated(getClass(),request);
 			request.body = body;
 			return this;
 		}
 		
-		public JsonRequest build() {
+		public Builder withBody(JsonObject body) {
+            assertNotInvalidated(getClass(), request);
+            request.body = body;
+            return this;
+        }
+		
+		public Builder withBody(Map<String,Object> body) {
+		    return withBody(MapMarshaller.marshal(body).toJson());
+		}
+		
+		public Request build() {
 			try {
 				assertNotInvalidated(getClass(), request);
 				return request;
@@ -105,8 +112,6 @@ public class JsonRequest {
 				this.request = null;
 			}
 		}
-		
-		
 	}
 	
 
@@ -120,7 +125,7 @@ public class JsonRequest {
 	private String path;
 	private HttpMethod method;
 	private Map<String,Object> headers;
-	private Map<String,Object> body;
+	private Object body;
 	
 	public String getPath() {
 		return path;
@@ -154,18 +159,24 @@ public class JsonRequest {
 	}
 	
 	public <T> T getHeader(String name) {
+	    if(headers == null) {
+	        return null;
+	    }
 		return (T) headers.get(name);
 	}
 	
 	public <T> T getBody(Class<T> entity){
-		return JsonProcessor.unmarshal(entity, getBody().toString());
+	    if(body == null) {
+	        return null;
+	    }
+	    if(entity.isInstance(body)){
+	        return (T) body;
+	    }
+		return unmarshal(entity, getBody().toString());
 	}
 	
-	public JsonObject getBody() {
-		if(body == null) {
-			return null;
-		}
-		return marshal(body).toJson();
+	public <T> T getBody() {
+		return (T) body;
 	}
 	
 }

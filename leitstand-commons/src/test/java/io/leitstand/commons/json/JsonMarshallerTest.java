@@ -54,4 +54,10 @@ public class JsonMarshallerTest {
 		assertEquals("{\"nested\":{\"name\":\"name\",\"value\":\"value\"}}",marshal(map).toString());
 	}
 	
+	@Test
+	public void can_marshall_string_as_JSON_string() {
+	    String test = "foo";
+	    assertEquals("\"foo\"",marshal(test).toString());
+	}
+	
 }

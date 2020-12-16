@@ -40,7 +40,6 @@ import org.junit.Test;
 
 import io.leitstand.commons.messages.Messages;
 
-@SuppressWarnings("unchecked")
 public class ResponsesTest {
 
 	private static final int HTTP_NO_CONTENT = 204;
