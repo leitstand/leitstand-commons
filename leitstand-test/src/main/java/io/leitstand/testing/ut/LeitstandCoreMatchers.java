@@ -72,13 +72,7 @@ public class LeitstandCoreMatchers {
 			public void describeTo(Description description) {
 				description.appendText(format("%s:isEmptyString", getClass().getSimpleName()));
 			}
-			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendValue(actualValue);
-				description.appendText("String is not empty!");
-			}
-			
+						
 		};
 	}
 	
@@ -95,11 +89,6 @@ public class LeitstandCoreMatchers {
 				description.appendText(format("%s:isEmptyMap", getClass().getSimpleName()));
 			}
 			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendText("Map is not empty!");
-			}
-			
 		};
 	}
 	
@@ -114,11 +103,6 @@ public class LeitstandCoreMatchers {
 			@Override
 			public void describeTo(Description description) {
 				description.appendText(format("%s:isEmptySet", getClass().getSimpleName()));
-			}
-			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendText("Set is not empty!");
 			}
 			
 		};
@@ -138,11 +122,6 @@ public class LeitstandCoreMatchers {
 				description.appendText(format("%s:isEmptyList", getClass().getSimpleName()));
 			}
 			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendText("List is not empty!");
-			}
-			
 		};
 	}
 	
@@ -158,11 +137,6 @@ public class LeitstandCoreMatchers {
 			@Override
 			public void describeTo(Description description) {
 				description.appendText(format("%s:isEmptyCollection", getClass().getSimpleName()));
-			}
-			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendText("Collection is not empty!");
 			}
 			
 		};
@@ -183,12 +157,6 @@ public class LeitstandCoreMatchers {
 											  size));
 			}
 			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendValue(actualValue);
-				description.appendText(format(" instead of %d",size));
-			}
-			
 		};
 	}
 	
@@ -207,12 +175,6 @@ public class LeitstandCoreMatchers {
 											  reason));
 			}
 			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendValue(actualValue);
-				description.appendText(format(" instead of %s",reason));
-			}
-
 		};
 	}
 	
@@ -255,12 +217,6 @@ public class LeitstandCoreMatchers {
 			public void describeTo(Description description) {
 				description.appendText(format("%s:contains item with specified predicate",
 										getClass().getSimpleName()));				
-			}
-			
-			@Override
-			public void describeMismatch(Object actualValue, Description description) {
-				description.appendValue(actualValue);
-				description.appendText(format(" does not contain any matching elements."));
 			}
 			
 		};

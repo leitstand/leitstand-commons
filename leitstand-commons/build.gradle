@@ -10,7 +10,7 @@ dependencies {
 
 
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-all:1.8.4'
+    testImplementation 'org.mockito:mockito-all:1.10.9'
     testImplementation 'javax:javaee-api:8.0'
     testImplementation 'org.postgresql:postgresql:42.2.5'
     testImplementation 'org.glassfish:javax.json:1.1.4'
