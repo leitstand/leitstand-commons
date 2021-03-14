@@ -13,17 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.leitstand.commons.log;
+package io.leitstand.commons.model;
 
 import static java.lang.ThreadLocal.withInitial;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Utility class to cache a <code>SimpleDateFormat</code> per thread, since <code>SimpleDateFormat</code> is not thread-safe.
  */
-class ThreadsafeDatePattern {
+public class ThreadsafeDatePattern {
 
 	private ThreadLocal<SimpleDateFormat> cache;
 
@@ -31,7 +32,7 @@ class ThreadsafeDatePattern {
 	 * Creates a <code>ThreadsafeDatePattern</code>.
 	 * @param pattern the simple date format
 	 */
-	ThreadsafeDatePattern(String pattern){
+	public ThreadsafeDatePattern(String pattern){
 		this.cache = withInitial(()->new SimpleDateFormat(pattern));
 	}
 	
@@ -40,8 +41,19 @@ class ThreadsafeDatePattern {
 	 * @param date the date to format
 	 * @return the formatted date.
 	 */
-	String format(Date date) {
+	public String format(Date date) {
 		return cache.get().format(date);
 	}
+	
+	/**
+	 * Remove the date pattern from the internal thread local.
+	 */
+	public void close() {
+	    this.cache.remove();
+	}
+
+    public Date parse(String date) throws ParseException  {
+        return cache.get().parse(date);
+    }
 	
 }

@@ -20,7 +20,6 @@ import static io.leitstand.commons.model.StringUtil.isEmptyString;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.client.ClientBuilder.newBuilder;
 import static javax.ws.rs.client.Entity.entity;
-import static javax.ws.rs.client.Entity.json;
 
 import java.io.StringReader;
 import java.net.URI;
@@ -33,12 +32,10 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Response;
 
 import io.leitstand.commons.jsonb.JsonbDefaults;
-import io.leitstand.commons.model.StringUtil;
 import io.leitstand.commons.template.Template;
 
 public class GenericRestClient {

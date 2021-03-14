@@ -15,7 +15,6 @@
  */
 package io.leitstand.commons.jsonb;
 
-import static io.leitstand.commons.jsonb.IsoDateAdapter.ISO_FORMAT;
 import static java.util.Calendar.AUGUST;
 import static java.util.Calendar.DST_OFFSET;
 import static java.util.Calendar.MILLISECOND;
@@ -25,11 +24,8 @@ import static java.util.TimeZone.getTimeZone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;

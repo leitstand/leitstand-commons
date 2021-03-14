@@ -17,12 +17,13 @@ package io.leitstand.commons.jsonb;
 
 import static java.util.logging.Level.FINE;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.json.bind.adapter.JsonbAdapter;
 import javax.ws.rs.ext.Provider;
+
+import io.leitstand.commons.model.ThreadsafeDatePattern;
 
 /**
  * Maps a <code>java.util.Date</code> to a string in ISO format (<code>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</code>)
@@ -34,7 +35,8 @@ public class IsoDateAdapter implements JsonbAdapter<Date,String> {
 
 	protected static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	public static final String ISO_PATTERN = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}[+|-]\\d{2}:\\d{2}";
-	private static final ThreadLocal<SimpleDateFormat> FORMAT = new ThreadLocal<>();
+	// Cache SimpleDateFormat per thread pool cache.
+	private static final ThreadsafeDatePattern FORMAT = new ThreadsafeDatePattern(ISO_FORMAT);
 
 	/**
 	 * Formats the specified date in ISO date format.
@@ -45,7 +47,7 @@ public class IsoDateAdapter implements JsonbAdapter<Date,String> {
 		if(date == null) {
 			return null;
 		}
-		return format().format(date);
+		return FORMAT.format(date);
 	}
 	
 	/**
@@ -59,7 +61,7 @@ public class IsoDateAdapter implements JsonbAdapter<Date,String> {
 			return null;
 		}
 		try{
-			return format().parse(date);
+			return FORMAT.parse(date);
 		} catch (Exception e){
 			LOG.log(FINE,e.getMessage(),e);
 			throw new IllegalArgumentException(e);
@@ -86,15 +88,6 @@ public class IsoDateAdapter implements JsonbAdapter<Date,String> {
 	@Override
 	public String adaptToJson(Date date) throws Exception {
 		return isoDateFormat(date);
-	}
-	
-	static SimpleDateFormat format(){
-		SimpleDateFormat format = FORMAT.get();
-		if(format == null){
-			format = new SimpleDateFormat(ISO_FORMAT);
-			FORMAT.set(format);
-		}
-		return format;
 	}
 
 }
