@@ -17,14 +17,20 @@ package io.leitstand.commons.model;
 
 import static io.leitstand.commons.model.BuilderUtil.assertNotInvalidated;
 import static io.leitstand.commons.model.BuilderUtil.requires;
+import static org.junit.Assert.fail;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class BuilderUtilTest {
+    
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
 	
-	@Test(expected=IllegalStateException.class)
 	public void throw_exception_when_instance_under_construction_is_null() {
+        exception.expect(IllegalStateException.class);
 		assertNotInvalidated(BuilderUtilTest.class, null);
 	}
 	
@@ -34,29 +40,38 @@ public class BuilderUtilTest {
 		assertNotInvalidated(BuilderUtilTest.class, new Object());
 	}
 	
-	@Test(expected=IllegalStateException.class)
 	public void throw_exception_when_required_string_is_null() {
-		requires(BuilderUtilTest.class, "dummy", (String)null);
+        exception.expect(IllegalStateException.class);
+	    requires(BuilderUtilTest.class, "dummy", (String)null);
 	}
 	
-	@Test(expected=IllegalStateException.class)
 	public void throw_exception_when_required_string_is_empty() {
-		requires(BuilderUtilTest.class, "dummy", "");
+        exception.expect(IllegalStateException.class);
+	    requires(BuilderUtilTest.class, "dummy", "");
 	}
 	
 	@Test
 	public void do_nothing_when_string_is_non_empty() {
-		requires(BuilderUtilTest.class, "dummy", "abc");
+	    try {
+	        requires(BuilderUtilTest.class, "dummy", "abc");
+	    } catch (Exception e) {
+	        fail("Unexpected exception!");
+	    }
+	       
 	}
 	
-	@Test(expected=IllegalStateException.class)
 	public void throw_exception_when_required_property_is_null() {
-		requires(BuilderUtilTest.class, "dummy", (Object) null);
+        exception.expect(IllegalStateException.class);
+	    requires(BuilderUtilTest.class, "dummy", (Object) null);
 	}
 	
 	@Test
 	public void do_nothing_when_object_is_not_null() {
-		requires(BuilderUtilTest.class, "dummy", new Object());
+	    try {
+	        requires(BuilderUtilTest.class, "dummy", new Object());
+	    } catch (Exception e) {
+	        fail("Unexpected exception");
+	    }
 	}
 	
 }

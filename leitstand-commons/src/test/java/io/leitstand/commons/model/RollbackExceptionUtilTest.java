@@ -3,6 +3,7 @@ package io.leitstand.commons.model;
 import static io.leitstand.commons.UniqueKeyConstraintViolationException.key;
 import static io.leitstand.commons.model.RollbackExceptionUtil.givenRollbackException;
 import static io.leitstand.commons.rs.ReasonCode.VAL0002E_INVALID_VALUE;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -39,19 +40,27 @@ public class RollbackExceptionUtilTest {
 	
 	@Test
 	public void do_not_throw_unique_key_constraint_violation_exception_if_entity_does_not_exist() {
-		givenRollbackException(new RollbackException())
+		try {
+	    givenRollbackException(new RollbackException())
 		.whenEntityExists(() -> null)
 		.thenThrow(new UniqueKeyConstraintViolationException(VAL0002E_INVALID_VALUE, // Dummy reason code.
 															 key("unit_test", "dummy")));
+		} catch (Exception e) {
+		    fail("Unexpected exception: "+e);
+		}
 	}
 	
 	
 	@Test
 	public void do_not_throw_unique_key_constraint_violation_exception_if_test_throws_EntityNotFoundException() {
-		givenRollbackException(new RollbackException())
+		try {
+	    givenRollbackException(new RollbackException())
 		.whenEntityExists(() -> {throw new EntityNotFoundException(VAL0002E_INVALID_VALUE, "dummy");}) // Dummy reason code.
 		.thenThrow(new UniqueKeyConstraintViolationException(VAL0002E_INVALID_VALUE, // Dummy reason code.
 															 key("unit_test", "dummy")));
+		} catch (Exception e) {
+		    fail("Unexpected exception: "+e);
+		}
 	}
 
 	@Test

@@ -10,7 +10,7 @@ dependencies {
     implementation project(':leitstand-commons')
 	
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-all:1.8.4'
+    testImplementation 'org.mockito:mockito-all:1.10.9'
     testImplementation 'org.glassfish:javax.json:1.1.4'
     testCompileOnly 'javax:javaee-api:8.0'
     testRuntimeOnly 'org.eclipse:yasson:1.0.3'

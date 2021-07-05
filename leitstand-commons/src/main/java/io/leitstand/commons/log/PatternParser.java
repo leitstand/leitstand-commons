@@ -31,6 +31,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.LogRecord;
 
+import io.leitstand.commons.model.ThreadsafeDatePattern;
+
 /**
  * Parser to process the {@link PatternFormatter} format to create a {@link LogRecordFormatter} that formats all log records.
  */

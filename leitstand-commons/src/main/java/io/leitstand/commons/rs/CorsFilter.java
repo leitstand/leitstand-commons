@@ -46,7 +46,7 @@ public class CorsFilter implements Filter{
 		String accessControlAllowOrigin = getSystemProperty(ACCESS_CONTROL_ALLOW_ORIGIN);
 		if(isNonEmptyString(accessControlAllowOrigin)) {
 			HttpServletResponse httpResponse = (HttpServletResponse)response;
-			httpResponse.addHeader("Access-Control-Allow-Origin","*");
+			httpResponse.addHeader("Access-Control-Allow-Origin",accessControlAllowOrigin);
 			httpResponse.addHeader("Access-Control-Allow-Credentials", "true");
 		}
 		

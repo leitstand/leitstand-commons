@@ -31,7 +31,6 @@ import java.util.Map;
 
 import javax.json.JsonObject;
 
-import io.leitstand.commons.json.JsonMarshaller;
 import io.leitstand.commons.json.MapMarshaller;
 
 public class Request {

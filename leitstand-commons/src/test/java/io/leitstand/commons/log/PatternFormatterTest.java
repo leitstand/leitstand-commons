@@ -113,11 +113,6 @@ public class PatternFormatterTest {
 	}
 	
 	@Test
-	public void format_thrown() {
-		
-	}
-
-	@Test
 	public void do_nothing_if_record_contains_no_thrown_info() {
 		record.setThrown(null);
 		PatternFormatter formatter = new PatternFormatter("%e");

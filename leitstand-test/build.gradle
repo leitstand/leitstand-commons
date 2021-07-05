@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api 'junit:junit:4.12'
     api 'javax:javaee-api:8.0'
+    api 'org.mockito:mockito-all:1.10.9'
     implementation 'com.h2database:h2:1.4.200'
     implementation project (':leitstand-commons')
 }
