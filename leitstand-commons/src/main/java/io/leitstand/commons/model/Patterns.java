@@ -28,7 +28,7 @@ public final class Patterns {
 	public static final String HTTP_URL_PATTERN = "https?\\:\\/\\/[A-Za-z0-9_-]+(?:.[A-Za-z0-9_-]+)+(?:\\:\\d[1-65536])?(?:\\/(?:[A-Za-z0-9_-\\{\\}])*)*";
 	
 	/** DNS name pattern.*/
-	public static final String DNS_PATTERN = "([A-Za-z0-9]{1,63}[.-]?)+";
+	public static final String DNS_PATTERN = "(?:[A-Za-z0-9]{1,63}[.\\-_]?)+[A-Za-z0-9]{1,63}";
 	
 	/** IPv4 address pattern.*/
 	public static final String IPV4_PATTERN = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}";

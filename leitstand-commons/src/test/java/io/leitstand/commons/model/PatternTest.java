@@ -15,7 +15,7 @@
  */
 package io.leitstand.commons.model;
 
-import static io.leitstand.commons.model.Patterns.HTTP_URL_PATTERN;
+import static io.leitstand.commons.model.Patterns.*;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -31,8 +31,8 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class PatternTest {
 	
-	private static final boolean MATCH = true;
-	private static final boolean MISMATCH = false;
+	private static final boolean MATCHES = true;
+	private static final boolean MATCHES_NOT = false;
 
 	private Pattern pattern;
 	private String  test;
@@ -42,30 +42,38 @@ public class PatternTest {
 	public static Collection<Object[]> getParameters(){
 
 		return asList(new Object[][]{
-			{HTTP_URL_PATTERN, "http://rtbrick",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com:80",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com:80/",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com:80/foo",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com:80/foo/bar",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com:80/foo/bar/foobar.html",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com/",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com/foo",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com/foo/bar",MATCH},
-			{HTTP_URL_PATTERN,"http://rtbrick.com/foo/bar/foobar.html",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com:443",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com:443/",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com:443/foo",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com:443/foo/bar",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com:443/foo/bar/foobar.html",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com/",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com/foo",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com/foo/bar",MATCH},
-			{HTTP_URL_PATTERN,"https://rtbrick.com/foo/bar/foobar.html",MATCH},
-			{HTTP_URL_PATTERN, "ftp://rtbrick",MISMATCH},
-			{HTTP_URL_PATTERN,"ftp://rtbrick.com",MISMATCH}});
+			{HTTP_URL_PATTERN, "http://rtbrick",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com:80",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com:80/",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com:80/foo",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com:80/foo/bar",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com:80/foo/bar/foobar.html",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com/",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com/foo",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com/foo/bar",MATCHES},
+			{HTTP_URL_PATTERN,"http://rtbrick.com/foo/bar/foobar.html",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com:443",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com:443/",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com:443/foo",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com:443/foo/bar",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com:443/foo/bar/foobar.html",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com/",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com/foo",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com/foo/bar",MATCHES},
+			{HTTP_URL_PATTERN,"https://rtbrick.com/foo/bar/foobar.html",MATCHES},
+			{HTTP_URL_PATTERN, "ftp://rtbrick",MATCHES_NOT},
+			{HTTP_URL_PATTERN,"ftp://rtbrick.com",MATCHES_NOT},
+			{DNS_PATTERN,"spine.lab.rtbrick.com",MATCHES},
+			{DNS_PATTERN,"xpc-spine",MATCHES},
+			{DNS_PATTERN,"spine.lab.",MATCHES_NOT},
+            {DNS_PATTERN,"spine1.lab.local",MATCHES},
+            {DNS_PATTERN,"spine-1.lab.local",MATCHES},
+            {DNS_PATTERN,"localhost",MATCHES},
+            {DNS_PATTERN,"0.0.0.0",MATCHES},
+            {DNS_PATTERN,"127.0.0.1",MATCHES}});
 	}
 
 	public PatternTest(String pattern, String test, boolean matches) {
