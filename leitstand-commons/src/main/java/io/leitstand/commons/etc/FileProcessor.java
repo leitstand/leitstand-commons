@@ -35,7 +35,7 @@ import org.yaml.snakeyaml.constructor.ConstructorException;
  */
 @FunctionalInterface
 public interface FileProcessor<T> {
-	
+    
 	/**
 	 * Creates a <code>FileProcessor</code> to parse a <code>properties</code> file.
 	 * Returns empty <code>java.uti.Properties</code> if the file does not exist.
