@@ -18,7 +18,7 @@ package io.leitstand.commons.rs;
 import java.util.Set;
 
 /**
- * Returns all API resources provided by a EMS module.
+ * Returns all API resources provided by a Leitstand module.
  * <p>
  * The provider must be a CDI managed bean.
  * <code>{@literal @Dependent}</code> scope is recommended, as the bean is only required at boot time.
@@ -28,7 +28,7 @@ import java.util.Set;
 public interface ApiResourceProvider {
 	
 	/**
-	 * Returns a set of API resources provided by a single module.
+	 * Returns the set of API resources provided by a single module.
 	 * @return an immutable set of API resources
 	 */
 	Set<Class<?>> getResources();
