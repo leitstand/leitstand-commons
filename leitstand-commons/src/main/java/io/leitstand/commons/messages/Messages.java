@@ -99,4 +99,11 @@ public class Messages implements Iterable<Message> {
 		return messageList.size();
 	}
 	
+	/**
+	 * Clears all messages.
+	 */
+	public void clear() {
+		messageList.clear();
+	}
+	
 }
