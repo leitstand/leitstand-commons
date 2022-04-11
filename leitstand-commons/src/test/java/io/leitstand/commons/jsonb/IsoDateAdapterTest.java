@@ -44,12 +44,10 @@ public class IsoDateAdapterTest {
 		cal.set(DST_OFFSET,3600000);
 		cal.setTimeInMillis(0);
 		cal.set(2020,AUGUST,3,14,32,05);
-		cal.add(MILLISECOND,150);
 		ref = cal.getTime();
-		iso = "2020-08-03T16:32:05.150+02:00";
+		iso = "2020-08-03T14:32:05Z";
 		adapter = new IsoDateAdapter();
 	}
-	
 	
 	@Test
 	public void null_string_is_mapped_to_null() throws Exception{
