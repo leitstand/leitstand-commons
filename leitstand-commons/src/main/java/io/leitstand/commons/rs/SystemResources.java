@@ -29,6 +29,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import io.leitstand.commons.jsonb.IsoDateAdapter;
+import io.leitstand.commons.jsonb.JsonMessageBodyWriter;
 import io.leitstand.commons.jsonb.JsonbDefaults;
 import io.leitstand.commons.jsonb.MessagesMessageBodyWriter;
 
@@ -77,6 +78,7 @@ public class SystemResources extends Application {
 		resources.add(ValidationExceptionMapper.class);
 		resources.add(IsoDateAdapter.class);
 		resources.add(MessagesMessageBodyWriter.class);
+		resources.add(JsonMessageBodyWriter.class);
 		resources.add(RollbackExceptionMapper.class);
 		resources.add(ServiceUnavailableExceptionMapper.class);
 		resources.add(JsonbDefaults.class);
