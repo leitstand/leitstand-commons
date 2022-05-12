@@ -52,8 +52,17 @@ public class Messages implements Iterable<Message> {
 	}
 	
 	/**
+	 * Adds a new messages at the given index.
+	 * @param index the index at which the message shall be added
+	 * @param message the message to be added 
+	 */
+	public void add(int index, Message message) {
+		messageList.add(index, message);
+	}
+	
+	/**
 	 * Adds a new message.
-	 * @param message - the message to be added.
+	 * @param message the message to be added.
 	 */
 	public void add(Message message){
 		messageList.add(message);

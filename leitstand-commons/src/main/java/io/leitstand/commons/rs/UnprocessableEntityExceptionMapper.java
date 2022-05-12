@@ -53,8 +53,10 @@ public class UnprocessableEntityExceptionMapper implements ExceptionMapper<Unpro
 					.build();
 		}
 		
-		messages.add(new Message(ERROR, 
-								 e.getReason().getReasonCode(), 
+		// Insert unprocessable entity message at the beginning of all returned messages.
+		messages.add(0,
+					 new Message(ERROR, 
+							 	 e.getReason().getReasonCode(), 
 								 e.getMessage()));
 		
 		return status(422)
