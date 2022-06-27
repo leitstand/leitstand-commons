@@ -24,12 +24,22 @@ import javax.json.JsonObject;
 import javax.ws.rs.core.Response;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import io.leitstand.commons.Reason;
 import io.leitstand.commons.UnprocessableEntityException;
+import io.leitstand.commons.messages.Messages;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UnprocessableEntityExceptionMapperTest {
 
+	@Mock
+	private Messages messages;
+	
+	@InjectMocks
 	private UnprocessableEntityExceptionMapper mapper = new UnprocessableEntityExceptionMapper();
 	
 	@Test
@@ -38,6 +48,7 @@ public class UnprocessableEntityExceptionMapperTest {
 		Reason reason = mock(Reason.class);
 		when(reason.getReasonCode()).thenReturn("TST0001E");
 		when(reason.getMessage(args)).thenReturn("Test message");
+		when(messages.isEmpty()).thenReturn(true);
 		
 		UnprocessableEntityException conflict = new UnprocessableEntityException(reason, args);
 		

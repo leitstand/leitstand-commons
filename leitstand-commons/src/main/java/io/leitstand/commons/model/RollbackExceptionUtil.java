@@ -5,6 +5,7 @@ import static java.lang.String.format;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import javax.persistence.PersistenceException;
 import javax.transaction.RollbackException;
 
 import io.leitstand.commons.EntityNotFoundException;
@@ -40,7 +41,14 @@ public class RollbackExceptionUtil {
 	}
 	
 
-
+	/**
+	 * Runs an action to resolve the rollback exception.
+	 * @param action the action to resolve the rollback exception.
+	 */
+	public void thenDo(Runnable action) {
+		action.run();
+	}
+	
 	
 	/**
 	 * Fires the specified {@link UniqueKeyConstraintViolationException} if the entity exists.
@@ -48,7 +56,7 @@ public class RollbackExceptionUtil {
 	 */
 	public void thenThrow(UniqueKeyConstraintViolationException e) {
 		try {
-			if(cause.getClass() != RollbackException.class) {
+			if(cause.getClass() != RollbackException.class && cause.getClass() != PersistenceException.class) {
 				return;
 			}
 			
