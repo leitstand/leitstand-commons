@@ -16,6 +16,7 @@
 package io.leitstand.commons.json;
 
 import static io.leitstand.commons.jpa.SerializableJsonObjectConverter.parseJson;
+import static java.util.Objects.hash;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -207,12 +208,22 @@ public class SerializableJsonObject implements JsonObject, Serializable{
 
 	@Override
 	public boolean equals(Object o) {
-		return object.equals(o);
+	    if (o == null) {
+	        return false;
+	    }
+	    if (o == this) {
+	        return true;
+	    }
+	    if (o.getClass() != getClass()) {
+	        return false;
+	    }
+	    SerializableJsonObject s = (SerializableJsonObject) o;
+		return object.equals(s.object);
 	}
 
 	@Override
 	public int hashCode() {
-		return object.hashCode();
+		return hash(object);
 	}
 
 	@Override

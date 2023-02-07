@@ -20,12 +20,15 @@ import static javax.json.Json.createObjectBuilder;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.status;
 
+import javax.inject.Inject;
 import javax.json.JsonObject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import io.leitstand.commons.UnprocessableEntityException;
+import io.leitstand.commons.messages.Message;
+import io.leitstand.commons.messages.Messages;
 
 /**
  * Maps an {@link UnprocessableEntityException} to HTTP Status Code <code>422 Unprocessable entity</code>.
@@ -33,17 +36,34 @@ import io.leitstand.commons.UnprocessableEntityException;
 @Provider
 public class UnprocessableEntityExceptionMapper implements ExceptionMapper<UnprocessableEntityException> {
 
+	@Inject
+	private Messages messages;
+	
 	@Override
 	public Response toResponse(UnprocessableEntityException e) {
-		JsonObject message = createObjectBuilder()
-				             .add("severity", ERROR.name())
-				             .add("reason", e.getReason().getReasonCode())
-				             .add("message", e.getMessage())
-				             .build();
+		if(messages.isEmpty()) {
+			JsonObject message = createObjectBuilder()
+								.add("severity", ERROR.name())
+								.add("reason", e.getReason().getReasonCode())
+								.add("message", e.getMessage())
+								.build();
+			return status(422)
+					.type(APPLICATION_JSON)
+					.entity(message)
+					.build();
+		}
+		
+		// Insert unprocessable entity message at the beginning of all returned messages.
+		messages.add(0,
+					 new Message(ERROR, 
+							 	 e.getReason().getReasonCode(), 
+								 e.getMessage()));
+		
 		return status(422)
 			   .type(APPLICATION_JSON)
-			   .entity(message)
+			   .entity(messages)
 			   .build();
+		
 	}
 	
 }

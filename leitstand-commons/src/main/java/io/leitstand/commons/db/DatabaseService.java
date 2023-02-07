@@ -66,7 +66,7 @@ public class DatabaseService {
 			return s.replace(" REGEXP "," ~ ");
 		}
 		// H2, MariaDB among other database use REGEXP rather than ~
-		return s.replace("~", " REGEXP ");
+		return s.replaceAll("(~\\*?)"," REGEXP ");
 	}
 	
 	@FunctionalInterface

@@ -34,28 +34,32 @@ import io.leitstand.commons.jsonb.JsonbDefaults;
 import io.leitstand.commons.jsonb.MessagesMessageBodyWriter;
 
 /**
- * Provider of all Leitstand API resources available in the current Leitstand installation.
+ * Provider of all Leitstand available system resources.
  * <p>
- * CDI is leveraged to discover all available {@link ApiResourceProvider} instances and obtain the available resources.
+ * System resources are used for managing the distributed Leitstand services and are not public available. 
+ * The API gateway providing access to all Leitstand APIs SHALL NOT forward requests to system resources.
+ * </p>
+ * CDI is leveraged to discover all available {@link SystemResourceProvider} instances and obtain the available resources.
+ * @see ApiResourceProvider
  */
-@ApplicationPath("/api/v1")
+@ApplicationPath("/system")
 @ApplicationScoped
-public class ApiResources extends Application {
+public class SystemResources extends Application {
 
-	private static final Logger LOG = Logger.getLogger(ApiResources.class.getName());
+	private static final Logger LOG = Logger.getLogger(SystemResources.class.getName());
 	
 	@Inject
-	private Instance<ApiResourceProvider> modules;
+	private Instance<SystemResourceProvider> modules;
 	
 	private Set<Class<?>> resources;
 	
 	@PostConstruct
 	protected void discoverResources() {
 		resources = new LinkedHashSet<>();
-		for(ApiResourceProvider module : modules) {
+		for(SystemResourceProvider module : modules) {
 			Set<Class<?>> moduleResources = module.getResources();
 			if(resources.addAll(moduleResources)) {
-				LOG.info(() -> format("Registered %2d API resources from %s", 
+				LOG.info(() -> format("Registered %2d system resources from %s", 
 									  moduleResources.size(), 
 									  module.getClass().getSimpleName()));
 				moduleResources.forEach(resource -> LOG.fine(format("Register %s for %s", 

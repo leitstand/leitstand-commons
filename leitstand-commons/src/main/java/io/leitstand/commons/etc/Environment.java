@@ -23,12 +23,14 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Logger.getLogger;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -58,10 +60,12 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Environment {
 
-	private static final Logger LOG = Logger.getLogger(Environment.class.getName());
+	private static final Logger LOG = getLogger(Environment.class.getName());
 
 	public static Environment emptyEnvironment() {
-		return new Environment();
+		Environment env = new Environment();
+		env.readEnvironmentProperties();
+		return env;
 	}
 
 	public static String getSystemProperty(String name) {
@@ -131,14 +135,24 @@ public class Environment {
 	
 	private File baseDir;
 	
+	protected Environment() {
+	    // CDI
+	}
+	
+	public Environment(File baseDir) {
+	    this.baseDir = baseDir;
+	}
+	
 	@PostConstruct
 	protected void readEnvironmentProperties() {
 		baseDir = new File(getSystemProperty("LEITSTAND_ETC_ROOT","/etc/leitstand"));
 	}
 	
 	public <T> T loadConfig(String fileName,
-						  FileProcessor<T> processor) {
-		return loadConfig(fileName,processor);
+						  	FileProcessor<T> processor) {
+		return loadConfig(fileName,
+						  processor,
+						  null);
 	}
 	
 	
@@ -263,6 +277,37 @@ public class Environment {
 			throw new UncheckedIOException(e);
 		}
 	}
+	
+	/**
+	 * Tests whether a file exists.
+	 * @param file the file
+	 * @return <code>true</code> if the file exists, <code>false</code> otherwise.
+	 */
+	public boolean fileExists(String file) {
+	    return new File(baseDir,file).exists();
+	}
+	
+	/**
+	 * Writes a file to the inventory.
+	 * @param file the file to be written.
+	 * @param exporter the file exporter.
+	 */
+	public void storeFile(String file, FileExporter exporter) {
+	    File config = new File(baseDir,file);
+	    try {
+	        config.createNewFile();
+	        try (FileWriter  writer = new FileWriter(config)){
+	            exporter.write(writer);
+	        }
+	    } catch (IOException e) {
+	        String msg = format("An I/O error occured while writing %s: %s",config,e);
+	        LOG.log(FINE,msg,e);
+	        throw new UncheckedIOException(e);
+	   }
+	        
+	    
+	}
+	
 
 	private URL openFileUrl( String file) {
 		

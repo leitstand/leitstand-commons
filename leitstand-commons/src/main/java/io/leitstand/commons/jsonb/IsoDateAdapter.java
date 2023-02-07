@@ -15,7 +15,9 @@
  */
 package io.leitstand.commons.jsonb;
 
+import static io.leitstand.commons.model.StringUtil.isEmptyString;
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Date;
 import java.util.logging.Logger;
@@ -31,12 +33,20 @@ import io.leitstand.commons.model.ThreadsafeDatePattern;
  */
 @Provider
 public class IsoDateAdapter implements JsonbAdapter<Date,String> {
-	private static final Logger LOG = Logger.getLogger(IsoDateAdapter.class.getName());
+	private static final Logger LOG = getLogger(IsoDateAdapter.class.getName());
 
-	protected static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+	protected static final String ISO_FORMAT_PATTERN_MILLIS_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	protected static final String ISO_FORMAT_PATTERN_UTC = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	protected static final String ISO_FORMAT_PATTERN_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+	protected static final String ISO_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssXXX";
+
+	
 	public static final String ISO_PATTERN = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}[+|-]\\d{2}:\\d{2}";
 	// Cache SimpleDateFormat per thread pool cache.
-	private static final ThreadsafeDatePattern FORMAT = new ThreadsafeDatePattern(ISO_FORMAT);
+	private static final ThreadsafeDatePattern ISO_FORMAT = new ThreadsafeDatePattern(ISO_FORMAT_PATTERN);
+	private static final ThreadsafeDatePattern ISO_FORMAT_MILLIS = new ThreadsafeDatePattern(ISO_FORMAT_PATTERN_MILLIS);
+	private static final ThreadsafeDatePattern ISO_FORMAT_UTC = new ThreadsafeDatePattern(ISO_FORMAT_PATTERN_UTC,"UTC");
+	private static final ThreadsafeDatePattern ISO_FORMAT_MILLIS_UTC = new ThreadsafeDatePattern(ISO_FORMAT_PATTERN_MILLIS_UTC,"UTC");
 
 	/**
 	 * Formats the specified date in ISO date format.
@@ -47,7 +57,7 @@ public class IsoDateAdapter implements JsonbAdapter<Date,String> {
 		if(date == null) {
 			return null;
 		}
-		return FORMAT.format(date);
+		return ISO_FORMAT_UTC.format(date);
 	}
 	
 	/**
@@ -57,11 +67,20 @@ public class IsoDateAdapter implements JsonbAdapter<Date,String> {
 	 * @return the date object or <code>null</code> if the specified date is <code>null</code> or empty.
 	 */
 	public static Date parseIsoDate(String date) {
-		if(date == null || date.isEmpty()){
+		if(isEmptyString(date)){
 			return null;
 		}
 		try{
-			return FORMAT.parse(date);
+			if (date.lastIndexOf('.') != -1) {
+				if (date.endsWith("Z")) {
+					return ISO_FORMAT_MILLIS_UTC.parse(date);
+				}
+				return ISO_FORMAT_MILLIS.parse(date);
+			}
+			if (date.endsWith("Z")) {
+				return ISO_FORMAT_UTC.parse(date);
+			}
+			return ISO_FORMAT.parse(date);
 		} catch (Exception e){
 			LOG.log(FINE,e.getMessage(),e);
 			throw new IllegalArgumentException(e);

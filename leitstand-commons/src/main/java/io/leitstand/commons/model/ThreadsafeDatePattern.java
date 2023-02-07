@@ -16,10 +16,12 @@
 package io.leitstand.commons.model;
 
 import static java.lang.ThreadLocal.withInitial;
+import static java.util.TimeZone.getTimeZone;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Utility class to cache a <code>SimpleDateFormat</code> per thread, since <code>SimpleDateFormat</code> is not thread-safe.
@@ -34,6 +36,30 @@ public class ThreadsafeDatePattern {
 	 */
 	public ThreadsafeDatePattern(String pattern){
 		this.cache = withInitial(()->new SimpleDateFormat(pattern));
+	}
+	
+	/**
+	 * Creates a <code>ThreadsafeDatePattern</code> and bounds it to the given timezone.
+	 * This allows generating UTC timestamps by binding the pattern to the UTC timezone.
+	 * @param pattern the date pattern
+	 * @param timezoneId the timezone identifier
+	 */
+	public ThreadsafeDatePattern(String pattern, String timezoneId) {
+		this(pattern, getTimeZone(timezoneId));
+	}
+	
+	/**
+	 * Creates a <code>ThreadsafeDatePattern</code> and bounds it to the given timezone.
+	 * This allows generating UTC timestamps by binding the pattern to the UTC timezone.
+	 * @param pattern the date pattern
+	 * @param timezoneId the timezone
+	 */
+	public ThreadsafeDatePattern(String pattern, TimeZone tz) {
+		this.cache = withInitial(() -> {
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			sdf.setTimeZone(tz);
+			return sdf;
+		});
 	}
 	
 	/**

@@ -15,7 +15,7 @@
  */
 package io.leitstand.commons.jpa;
 
-import static io.leitstand.commons.json.SerializableJsonObject.serializable;
+import static io.leitstand.commons.json.SerializableJsonStructure.serializable;
 import static javax.json.Json.createObjectBuilder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -26,12 +26,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.postgresql.util.PGobject;
 
-import io.leitstand.commons.json.SerializableJsonObject;
+import io.leitstand.commons.json.SerializableJsonStructure;
 
-public class SerializableJsonConverterTest {
+public class SerializableJsonStructConverterTest {
 	
-	private SerializableJsonObjectConverter converter = new SerializableJsonObjectConverter();
-	private SerializableJsonObject ref;
+	private SerializableJsonStructureConverter converter = new SerializableJsonStructureConverter();
+	private SerializableJsonStructure ref;
 	private String json;
 	
 	@Before
